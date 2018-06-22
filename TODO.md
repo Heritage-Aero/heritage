@@ -1,0 +1,3 @@
+Pre-activation campaign management
+Edit certificates
+Delete certificates
