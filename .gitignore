@@ -1,7 +1,4 @@
-ENVVAR.env
-public/scripts.js
-public/styles/style.css
-public/admin/styles.css
+build
 
 # Logs
 logs

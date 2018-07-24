@@ -1,8 +1,8 @@
 pragma solidity ^0.4.19;
 
-import 'zeppelin-solidity/contracts/token/ERC721/ERC721Token.sol';
+import 'zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol';
 
-contract Asset is ERC721Token {
+contract Asset is ERC721BasicToken {
   function name() external pure returns (string _name) {
     _name = "Heritage";
   }
