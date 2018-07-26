@@ -1,11 +1,12 @@
 pragma solidity ^0.4.24;
 
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'zeppelin-solidity/contracts/ownership/NoOwner.sol';
 import './Managed.sol';
 import './Asset.sol';
 
 // Needs gas opti
-contract Notarizer is Ownable, Managed, Asset {
+contract Notarizer is Ownable, Managed, Asset, NoOwner {
 
 Template[] public templates;
 Donation[] public donations;
@@ -15,6 +16,7 @@ uint256 public totalDonations;
 
   struct Template {
     string description;
+    uint256 goal;
     address beneficiary;
   }
 
@@ -24,24 +26,28 @@ uint256 public totalDonations;
     address donor;
   }
 
-  constructor() public {
-    _createDonation("Genesis Template", address(0));
+  constructor() public payable {
+    require(msg.value == 0);
+
+    _createDonation("Genesis Donation", 0, address(0));
     _makeDonation(0, 0, address(0));
   }
 
   function createDonation(
     string _description,
+    uint256 _goal,
     address _beneficiary
   )
     onlyManagers
     public
     returns (uint256)
   {
-    return _createDonation(_description, _beneficiary);
+    return _createDonation(_description, _goal, _beneficiary);
   }
 
   function _createDonation(
     string _description,
+    uint256 _goal,
     address _beneficiary
   )
     internal
@@ -49,6 +55,7 @@ uint256 public totalDonations;
   {
     Template memory _template = Template({
       description: _description,
+      goal: _goal,
       beneficiary: _beneficiary
     });
 

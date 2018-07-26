@@ -36,7 +36,6 @@
     "ganache-cli": "^6.1.6",
     "html-webpack-plugin": "^2.28.0",
     "json-loader": "^0.5.4",
-    "solidity-coverage": "^0.4.15",
     "style-loader": "^0.13.1",
     "truffle": "^4.1.13",
     "truffle-contract": "^1.1.11",

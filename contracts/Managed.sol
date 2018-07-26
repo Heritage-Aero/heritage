@@ -2,7 +2,7 @@ pragma solidity ^0.4.24;
 
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
-contract Managed is Ownable {
+contract Managed is Ownable{
 
   mapping(address => bool) managers;
 
@@ -14,7 +14,9 @@ contract Managed is Ownable {
     _;
   }
 
-  constructor() {
+  constructor() public payable {
+    require(msg.value == 0);
+
     managers[msg.sender] = true;
   }
 
@@ -26,5 +28,9 @@ contract Managed is Ownable {
   function removeManager(address _manager) public onlyOwner {
     managers[_manager] = false;
     emit RemoveManager(_manager);
+  }
+
+  function isManager(address _manager) public view returns (bool) {
+    return managers[_manager];
   }
 }
