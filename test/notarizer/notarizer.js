@@ -75,10 +75,6 @@ contract('Notarizer', accounts => {
         const totalDonations = await notary.totalDonations();
         totalDonations.should.be.bignumber.equal(donationsToCreate+1);
       })
-      it('Has totalRaised', async () => {
-        const totalRaised = await notary.totalRaised();
-        totalRaised.should.be.bignumber.equal(0);
-      })
       it('Makes a donation, creates a badge and amount raised increases', async () => {
         await notary.makeDonation(1, {from: creator, value: oneEther});
         const totalBadges = await notary.totalBadges();
@@ -90,9 +86,6 @@ contract('Notarizer', accounts => {
         // Amount Raised increases
         const donation = await notary.donations(1);
         donation[2].should.be.bignumber.equal(oneEther);
-
-        const totalRaised = await notary.totalRaised();
-        totalRaised.should.be.bignumber.equal(oneEther);
       });
 
       it('Makes many donations', async () => {
@@ -108,12 +101,9 @@ contract('Notarizer', accounts => {
 
         const donation = await notary.donations(1);
         donation[2].should.be.bignumber.equal(oneEther*testDonations);
-
-        const totalRaised = await notary.totalRaised();
-        totalRaised.should.be.bignumber.equal(oneEther*testDonations);
       });
 
-      it('Creates multiple donations, donates to some of them and tracks totalRaised', async() => {
+      it('Creates multiple donations, donates to some of them', async() => {
         const charityStartingBalance = await web3.eth.getBalance(charity).toNumber();
 
         await notary.createDonation("2 - Donation Campaign", oneEther, charity);

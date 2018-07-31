@@ -3,20 +3,13 @@ pragma solidity ^0.4.24;
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 import 'zeppelin-solidity/contracts/ownership/NoOwner.sol';
 import './Managed.sol';
-import './Asset.sol';
+import './Donation.sol';
 
 // Needs gas opti
-contract Notarizer is Ownable, Managed, Asset, NoOwner {
+contract Notarizer is Ownable, Managed, Donation, NoOwner {
 
-Donation[] public donations;
 Badge[] public badges;
-
-  struct Donation {
-    string description;
-    uint128 goal;
-    uint128 raised;
-    address beneficiary;
-  }
+uint256 public totalRaised;
 
   struct Badge {
     uint64 donationId;
@@ -41,25 +34,6 @@ Badge[] public badges;
     returns (uint256)
   {
     return _createDonation(_description, _goal, _beneficiary);
-  }
-
-  function _createDonation(
-    string _description,
-    uint128 _goal,
-    address _beneficiary
-  )
-    internal
-    returns (uint256)
-  {
-    Donation memory _donation = Donation({
-      description: _description,
-      goal: _goal,
-      raised: 0,
-      beneficiary: _beneficiary
-    });
-
-    uint256 newDonationId = donations.push(_donation);
-    return newDonationId;
   }
 
   function makeDonation(uint64 _donationId)
@@ -92,6 +66,11 @@ Badge[] public badges;
 
     donations[_donationId].raised += _amount;
     donations[_donationId].beneficiary.transfer(_amount);
+    totalRaised += _amount;
     return newBadgeId;
+  }
+
+  function totalBadges() external view returns (uint256 _totalBadges) {
+    _totalBadges = badges.length;
   }
 }
