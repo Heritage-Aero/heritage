@@ -40,12 +40,16 @@ contract('Managed', accounts => {
         isManager.should.be.equal(false);
       });
       it('Contract owner adds a new manager', async () => {
-        await managed.addManager(mgr2);
+        let receipt = await managed.addManager(mgr2);
+        receipt = await web3.eth.getTransactionReceipt(receipt.tx);
+        // console.log(receipt.gasUsed)
         const isManager = await managed.isManager(mgr2);
         isManager.should.be.equal(true);
       });
       it('Contract owner removes a manager', async () => {
-        await managed.removeManager(mgr1);
+        let receipt = await managed.removeManager(mgr1);
+        receipt = await web3.eth.getTransactionReceipt(receipt.tx);
+        // console.log(receipt.gasUsed)
         const isManager = await managed.isManager(mgr1);
         isManager.should.be.equal(false);
       });
@@ -53,13 +57,13 @@ contract('Managed', accounts => {
         await managed.managersOnly({from: mgr1});
       });
 
-      describe('Owner Fail Cases', async () => {
+      context('Owner Fail Cases', async () => {
         it('User cannot add a new manager', async () => {
           await assertRevert(managed.addManager(mgr2, {from: user}));
         });
       })
 
-      describe('Non-Manager Fail Cases', async () => {
+      context('Non-Manager Fail Cases', async () => {
         it('Non-Manager calls a managersOnly function and fails', async () => {
           await assertRevert(managed.managersOnly({ from: user }))
         })

@@ -27,6 +27,7 @@
     "copy-webpack-plugin": "^4.5.2",
     "css-loader": "^0.26.1",
     "eslint": "^3.14.0",
+    "eslint-config-google": "^0.9.1",
     "eslint-config-standard": "^6.0.0",
     "eslint-plugin-babel": "^4.0.0",
     "eslint-plugin-mocha": "^4.12.1",
