@@ -9,6 +9,7 @@ contract DonationCore is ERC721BasicToken {
   uint128 public totalDonations;
 
   mapping (uint32 => string) public donationDescription;
+  mapping (uint32 => string) public donationTaxId;
   mapping (uint32 => address) public donationBeneficiary;
   mapping (uint32 => uint128) public donationGoal;
   mapping (uint32 => uint128) public donationRaised;
@@ -16,14 +17,14 @@ contract DonationCore is ERC721BasicToken {
   struct Donation {
     uint32 donationId;  // 4 bytes
     uint128 amount;     // 16 bytes
-    address beneficiary;// 20 bytes
-    string description; // <= 24 bytes (n bytes)
+    address donor;      // 20 bytes
   }
 
   function _createDonation(
     string _description,
     uint128 _goal,
-    address _beneficiary
+    address _beneficiary,
+    string _taxId
   )
     internal
     returns (uint256)
@@ -31,13 +32,16 @@ contract DonationCore is ERC721BasicToken {
     Donation memory _donation = Donation({
       donationId: uint32(donations.length),
       amount: 0,
-      beneficiary: _beneficiary,
-      description: _description
+      donor: address(0)
     });
 
-    uint256 newDonationId = donations.push(_donation) - 1;
-    _mint(_beneficiary, newDonationId);
+    uint32 newDonationId = uint32(donations.push(_donation) - 1);
+    _mint(msg.sender, newDonationId);
+
+    donationDescription[newDonationId] = _description;
+    donationBeneficiary[newDonationId] = _beneficiary;
     donationGoal[newDonationId] = _goal;
+    donationTaxId[newDonationId] = _taxId;
 
     return newDonationId;
   }
@@ -48,17 +52,15 @@ contract DonationCore is ERC721BasicToken {
   {
     Donation memory _donation = Donation({
       donationId: _donationId,
-      description: donations[_donationId].description,
       amount: _amount,
-      beneficiary: donations[_donationId].beneficiary
+      donor: msg.sender
     });
 
-    uint256 newDonationId = donations.push(_donation) - 1;
+    uint32 newDonationId = uint32(donations.push(_donation) - 1);
     _mint(msg.sender, newDonationId);
     totalDonations++;
     return newDonationId;
   }
-
 
   function name() external pure returns (string _name) {
     _name = "Heritage";
@@ -68,9 +70,34 @@ contract DonationCore is ERC721BasicToken {
     _symbol = "A^3";
   }
 
+  function getDonation(uint32 _id) external view
+    returns (
+      uint32 _donationId,
+      string _description,
+      uint128 _goal,
+      uint128 _raised,
+      uint128 _amount,
+      address _beneficiary,
+      address _donor,
+      string _taxId
+      ) {
+
+        uint32 donationId = donations[_id].donationId;
+
+        _donationId = _id;
+        _description = donationDescription[donationId];
+        _goal = donationGoal[donationId];
+        _raised = donationRaised[donationId];
+        _amount = donations[_id].amount;
+        _beneficiary = donationBeneficiary[donationId];
+        _donor = donations[_id].donor;
+        _taxId = donationTaxId[donationId];
+  }
+
   function totalDonationsMade() external view returns (uint256 _totalDonations) {
     _totalDonations = totalDonations;
   }
+
   function totalDonationsCreated() external view returns (uint256 _totalDonations) {
     _totalDonations = donations.length - totalDonations;
   }

@@ -13,13 +13,14 @@ contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, Donatio
   constructor() public payable {
     require(msg.value == 0);
 
-    _createDonation("Genesis Donation", 0, this);
+    _createDonation("Genesis Donation", 0, this, "");
   }
 
   function createDonation(
     string _description,
     uint128 _goal,
-    address _beneficiary
+    address _beneficiary,
+    string _taxId
   )
     public
     onlyManagers
@@ -27,7 +28,7 @@ contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, Donatio
     returns (uint256)
   {
     require(donations.length < 4294967296 - 1); // 2^32-1
-    return _createDonation(_description, _goal, _beneficiary);
+    return _createDonation(_description, _goal, _beneficiary, _taxId);
   }
 
   function makeDonation(uint32 _donationId)
@@ -46,6 +47,7 @@ contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, Donatio
     require(donations.length < 4294967296 - 1);
     // Lookup the original donation
     uint32 donationId = donations[_donationId].donationId;
+
     // A goal of 0 is uncapped
     if (donationGoal[donationId] > 0) {
       // It must not have reached it's goal
@@ -58,7 +60,7 @@ contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, Donatio
       donationRaised[_donationId] += amount;
     }
     // Send the tx value to the charity
-    donations[donationId].beneficiary.transfer(amount);
+    donationBeneficiary[donationId].transfer(amount);
     // Update the amount raised for the donation
     donationRaised[donationId] += amount;
     // Update the total amount the contract has raised
