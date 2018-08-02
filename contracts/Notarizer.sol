@@ -1,18 +1,19 @@
 pragma solidity ^0.4.24;
 
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'zeppelin-solidity/contracts/lifecycle/Pausable.sol';
+import 'zeppelin-solidity/contracts/lifecycle/Destructible.sol';
 import 'zeppelin-solidity/contracts/ownership/NoOwner.sol';
 import './Managed.sol';
-import './Badge.sol';
+import './DonationCore.sol';
 
 // Needs gas opti
-contract Notarizer is Ownable, Managed, Badge, NoOwner {
+contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, DonationCore {
 
   constructor() public payable {
     require(msg.value == 0);
 
-    _createDonation("Genesis Donation", 0, address(0));
-    _makeDonation(0, 0, address(0));
+    _createDonation("Genesis Donation", 0, this);
   }
 
   function createDonation(
@@ -20,24 +21,49 @@ contract Notarizer is Ownable, Managed, Badge, NoOwner {
     uint128 _goal,
     address _beneficiary
   )
-    onlyManagers
     public
+    onlyManagers
+    whenNotPaused
     returns (uint256)
   {
+    require(donations.length < 4294967296 - 1); // 2^32-1
     return _createDonation(_description, _goal, _beneficiary);
   }
 
-  function makeDonation(uint64 _donationId)
+  function makeDonation(uint32 _donationId)
     public
     payable
+    whenNotPaused
     returns (uint256)
   {
+    // Must make a donation
     require(msg.value > 0);
-    // If the goal is 0 then donations are uncapped
-    if (donations[_donationId].goal != 0) {
-      require(donations[_donationId].raised < donations[_donationId].goal);
+    // Cannot donate to Genesis
+    require(_donationId > 0);
+    // Must donate to an existing donation
+    require(_donationId < donations.length);
+    // 2^32-1
+    require(donations.length < 4294967296 - 1);
+    // Lookup the original donation
+    uint32 donationId = donations[_donationId].donationId;
+    // A goal of 0 is uncapped
+    if (donationGoal[donationId] > 0) {
+      // It must not have reached it's goal
+      require(donationRaised[donationId] < donationGoal[donationId]);
     }
 
-    return _makeDonation(_donationId, uint128(msg.value), msg.sender);
+    uint128 amount = uint128(msg.value);
+    // Donate through another person's donation
+    if (donationId != _donationId) {
+      donationRaised[_donationId] += amount;
+    }
+    // Send the tx value to the charity
+    donations[donationId].beneficiary.transfer(amount);
+    // Update the amount raised for the donation
+    donationRaised[donationId] += amount;
+    // Update the total amount the contract has raised
+    totalRaised += amount;
+
+    return _makeDonation(donationId, amount);
   }
 }

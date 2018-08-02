@@ -25,11 +25,7 @@ contract('Notarizer', accounts => {
   })
 
   describe('Tests', () => {
-    beforeEach(async () => {
-      for(let i=0; i<donationsToCreate; i++) {
-        await notary.createDonation(`Campaign-${i}`, 10e18, charity);
-      }
-    })
+
     describe('Notary', async () => {
       it('Has a name.', async () => {
         const name = await notary.name();
@@ -49,103 +45,84 @@ contract('Notarizer', accounts => {
       it('Has a Genesis Donation.', async () => {
         const genesisDonation = await notary.donations(0);
 
-        genesisDonation[0].should.be.equal(genesisDonationName);
+        genesisDonation[0].should.be.bignumber.equal(0);
         genesisDonation[1].should.be.bignumber.equal(0);
-        genesisDonation[2].should.be.bignumber.equal(0);
-        genesisDonation[3].should.be.equal(zeroAddress);
-      });
-      it('Has a Genesis Badge.', async () => {
-        const genesisBadge = await notary.badges(0);
-
-        genesisBadge[0].should.be.bignumber.equal(0);
-        genesisBadge[1].should.be.bignumber.equal(0);
-        genesisBadge[2].should.be.bignumber.equal(zeroAddress);
+        genesisDonation[2].should.be.equal((await notary.address));
+        genesisDonation[3].should.be.equal(genesisDonationName);
       });
       it('Creates a Donation.', async () => {
-        await notary.createDonation("Campaign Name For Issue Test6", oneEther, charity);
-        const totalDonations = await notary.totalDonations();
-        const donation = await notary.donations(totalDonations-1);
-
-        donation[0].should.be.equal('Campaign Name For Issue Test6');
-        donation[1].should.be.bignumber.equal(oneEther);
-        donation[2].should.be.bignumber.equal(0);
-        donation[3].should.be.equal(charity);
-      });
-      it('Has totalDonations', async () => {
-        const totalDonations = await notary.totalDonations();
-        totalDonations.should.be.bignumber.equal(donationsToCreate+1);
-      })
-      it('Makes a donation, creates a badge and amount raised increases', async () => {
-        await notary.makeDonation(1, {from: creator, value: oneEther});
-        const totalBadges = await notary.totalBadges();
-        const badge = await notary.badges(totalBadges - 1);
-
-        badge[0].should.be.bignumber.equal(1);
-        badge[1].should.be.bignumber.equal(oneEther);
-        badge[2].should.be.bignumber.equal(creator);
-        // Amount Raised increases
+        await notary.createDonation("10 Laptops", 10*10e18, charity);
         const donation = await notary.donations(1);
-        donation[2].should.be.bignumber.equal(oneEther);
+
+        donation[0].should.be.bignumber.equal(1);
+        donation[1].should.be.bignumber.equal(0);
+        donation[2].should.be.equal(charity);
+        donation[3].should.be.equal("10 Laptops");
+        (await notary.donationGoal(1)).should.be.bignumber.equal(10 * 10e18);
+        (await notary.donationRaised(1)).should.be.bignumber.equal(0);
       });
-
-      it('Makes many donations', async () => {
-        const startingBadges = (await notary.totalBadges()).toNumber();
-        const testDonations = 10;
-
-        for (let i = 0; i < testDonations; i++) {
-          await notary.makeDonation(1, { from: creator, value: oneEther });
-        }
-        const totalBadges = await notary.totalBadges();
-
-        totalBadges.should.be.bignumber.equals(startingBadges+testDonations);
-
-        const donation = await notary.donations(1);
-        donation[2].should.be.bignumber.equal(oneEther*testDonations);
-      });
-
-      it('Creates multiple donations, donates to some of them', async() => {
-        const charityStartingBalance = await web3.eth.getBalance(charity).toNumber();
-
-        await notary.createDonation("2 - Donation Campaign", oneEther, charity);
-        await notary.createDonation("3 - Uncapped Donation Campaign", 0, charity);
-
-        await notary.makeDonation(1, { from: creator, value: oneEther });
-        const balance = await web3.eth.getBalance(charity).toNumber();
-
-        await notary.makeDonation(2, { from: creator, value: oneEther });
-        await notary.makeDonation(3, { from: creator, value: oneEther });
-        await notary.makeDonation(3, { from: creator, value: oneEther });
-        await notary.makeDonation(3, { from: creator, value: oneEther * 10 });
-
-        // Amount Raised increases
-        const donation1 = await notary.donations(1);
-        const donation2 = await notary.donations(2);
-        const donation3 = await notary.donations(3);
-
-        donation1[2].should.be.bignumber.equal(oneEther);
-        donation2[2].should.be.bignumber.equal(oneEther);
-        donation3[2].should.be.bignumber.equal(oneEther * 12);
-
-        const totalRaised = await notary.totalRaised();
-        totalRaised.should.be.bignumber.equal(oneEther * 14);
-
-        const charityEndBalance = await web3.eth.getBalance(charity).toNumber();
-        const charityBalanceChange = charityEndBalance - charityStartingBalance;
-        charityBalanceChange.should.be.equal(oneEther * 14);
-      });
-
-
-      context('Manager Fail Cases', async () => {
-
+      it('Has totalDonationsCreated', async () => {
+        const created = await notary.totalDonationsCreated();
+        created.should.be.bignumber.equal(1);
       })
+      it('Has totalDonationsMade', async () => {
+        const created = await notary.totalDonationsMade();
+        created.should.be.bignumber.equal(0);
+      })
+      it('Makes a donation', async () => {
+        await notary.createDonation("10 Laptops", 10 * 10e18, charity);
+        await notary.makeDonation(1, {value: 10e18, from: creator});
+        const donation = await notary.donations(2);
+
+        donation[0].should.be.bignumber.equal(1);
+        donation[1].should.be.bignumber.equal(10e18);
+        donation[2].should.be.equal(charity);
+        donation[3].should.be.equal("10 Laptops");
+
+        (await notary.ownerOf(2)).should.be.equal(creator);
+        (await notary.totalRaised()).should.be.bignumber.equal(10e18);
+        (await notary.donationRaised(1)).should.be.bignumber.equal(10e18);
+      });
+      it('Makes a donation through a previous donation', async () => {
+        await notary.createDonation("10 Laptops", 10 * 10e18, charity);
+        await notary.makeDonation(1, { value: 10e18, from: creator });
+        await notary.makeDonation(2, { value: 10e18, from: donor1 });
+
+        const donation = await notary.donations(3);
+
+        donation[0].should.be.bignumber.equal(1);
+        donation[1].should.be.bignumber.equal(10e18);
+        donation[2].should.be.equal(charity);
+        donation[3].should.be.equal("10 Laptops");
+
+        (await notary.ownerOf(3)).should.be.equal(donor1);
+
+        (await notary.ownerOf(2)).should.be.equal(creator);
+        (await notary.totalRaised()).should.be.bignumber.equal(2*10e18);
+
+        const donation1Raised = (await notary.donationRaised(1)).toNumber();
+        const donation2Raised = (await notary.donationRaised(2)).toNumber();
+
+        donation1Raised.should.be.equal(2*10e18);
+        donation2Raised.should.be.equal(10e18);
+      });
+
 
       context('User Fail Cases', async () => {
         it('Fails if the donation amount is zero', async () => {
-          await assertRevert(notary.makeDonation(1, { value: 0 }));
+          await assertRevert(notary.makeDonation(1, { value: 0, from: creator }));
         })
-        it('Fails if the donation goal is met', async () => {
-          await notary.makeDonation(1, { value: oneEther*10 });
-          await assertRevert(notary.makeDonation(1, { value: oneEther }));
+        it('Fails if the donation is for the Genesis Donation', async () => {
+          await assertRevert(notary.makeDonation(0, { value: 10e18, from: creator }));
+        })
+        it('Fails if the donation does not exist', async () => {
+          await assertRevert(notary.makeDonation(10, { value: 10e18, from: creator }));
+        })
+        it('Fails if the donation has reached its goal', async () => {
+          await notary.createDonation("10 Laptops", 10 * 10e18, charity);
+          await notary.makeDonation(1, { value: 10*10e18, from: creator });
+          await assertRevert(notary.makeDonation(1, { value: 10e18, from: creator }));
+          await assertRevert(notary.makeDonation(2, { value: 10e18, from: creator }));
         })
       })
     })

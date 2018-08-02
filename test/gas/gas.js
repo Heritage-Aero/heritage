@@ -33,7 +33,8 @@ contract('Notarizer', accounts => {
         console.log(receipt.gasUsed)
       })
       it('Cost for making a donation', async() => {
-        let receipt = await notary.makeDonation(1, {value: 10e18});
+        let receipt = await notary.makeDonation(1, { value: 10e18, from: creator });
+
         receipt = await web3.eth.getTransactionReceipt(receipt.tx);
         console.log(receipt.gasUsed)
       })
