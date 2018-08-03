@@ -104,7 +104,7 @@ contract('Heritage', accounts => {
         created.should.be.bignumber.equal(1);
       })
       it('Creates a Donation.', async () => {
-        await heritage.createDonation("10 Laptops", 10*10e18, charity, taxId);
+        const { logs } = await heritage.createDonation("10 Laptops", 10*10e18, charity, taxId);
         const donation = await heritage.getDonation(1);
 
         donation[0].should.be.bignumber.equal(1);
@@ -116,10 +116,12 @@ contract('Heritage', accounts => {
         donation[6].should.be.equal(charity);
         donation[7].should.be.equal(zeroAddress);
         donation[8].should.be.equal(taxId);
+
+        logs[1].event.should.be.equal('CreateDonation');
       });
       it('Issues a Donation', async() => {
         await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-        await heritage.issueDonation(1, 1000, zeroAddress);
+        const { logs } = await heritage.issueDonation(1, 1000, zeroAddress);
 
         const donation = await heritage.getDonation(2);
 
@@ -132,10 +134,12 @@ contract('Heritage', accounts => {
         donation[6].should.be.equal(charity);
         donation[7].should.be.equal(zeroAddress);
         donation[8].should.be.equal(taxId);
+
+        logs[0].event.should.be.equal('IssueDonation');
       })
       it('Makes a donation', async () => {
         await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-        await heritage.makeDonation(1, {value: 10e18, from: creator});
+        const { logs } = await heritage.makeDonation(1, {value: 10e18, from: creator});
         const donation = await heritage.getDonation(2);
 
         donation[0].should.be.bignumber.equal(1);
@@ -151,16 +155,20 @@ contract('Heritage', accounts => {
         (await heritage.ownerOf(2)).should.be.equal(creator);
         (await heritage.totalRaised()).should.be.bignumber.equal(10e18);
         (await heritage.donationRaised(1)).should.be.bignumber.equal(10e18);
+
+        logs[1].event.should.be.equal('MakeDonation');
       });
       it('Deletes a donation', async() => {
         await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-        await heritage.deleteDonation(1);
+        const { logs } = await heritage.deleteDonation(1);
 
         const d = await heritage.donations(1);
 
         d[0].should.be.bignumber.equal(0);
         d[1].should.be.bignumber.equal(0);
         d[2].should.be.equal(zeroAddress);
+
+        logs[0].event.should.be.equal('DeleteDonation');
       })
       it('Makes a donation through a previous donation', async () => {
         await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
