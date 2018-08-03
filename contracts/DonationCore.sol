@@ -2,9 +2,29 @@ pragma solidity ^0.4.24;
 
 import 'zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol';
 
+// Todo
+// Destroy Proxy
+// Mock Proxy
+
+
+contract Proxy {
+  DonationCore donationCore;
+  uint32 donationId;
+
+  constructor(uint32 _donationId) {
+    donationId = _donationId;
+    donationCore = DonationCore(msg.sender);
+  }
+
+  function() payable {
+    donationCore.proxyDonation.value(msg.value)(donationId, msg.sender);
+  }
+}
+
 contract DonationCore is ERC721BasicToken {
   // Soft cap of 4,294,967,295 (2^32-1)
   Donation[] public donations;
+
   uint128 public totalRaised;
   uint128 public totalDonations;
   uint128 public totalIssued;
@@ -15,10 +35,37 @@ contract DonationCore is ERC721BasicToken {
   mapping (uint32 => uint128) public donationGoal;
   mapping (uint32 => uint128) public donationRaised;
 
+  mapping (address => bool) public isProxy;
+
+  modifier onlyProxy() {
+    require(isProxy[msg.sender]);
+    _;
+  }
+
   struct Donation {
     uint32 donationId;  // 4 bytes
     uint128 amount;     // 16 bytes
     address donor;      // 20 bytes
+  }
+
+  function proxyDonation(
+    uint32 _donationId,
+    address _donor
+  )
+    public
+    payable
+    onlyProxy
+  {
+    _makeDonation(_donationId, uint128(msg.value), _donor);
+  }
+
+  function createDonationProxy(uint32 _donationId)
+    public
+    returns (address proxyAddress)
+  {
+    Proxy p = new Proxy(_donationId);
+    isProxy[p] = true;
+    return p;
   }
 
   function _createDonation(
