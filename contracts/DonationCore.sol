@@ -4,6 +4,7 @@ import 'zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol';
 
 contract DonationCore is ERC721BasicToken {
   // Soft cap of 4,294,967,295 (2^32-1)
+  // E.g. Fill every block for ~50 years
   Donation[] public donations;
   uint128 public totalRaised;
   uint128 public totalDonations;
@@ -14,6 +15,18 @@ contract DonationCore is ERC721BasicToken {
   mapping (uint32 => address) public donationBeneficiary;
   mapping (uint32 => uint128) public donationGoal;
   mapping (uint32 => uint128) public donationRaised;
+
+  mapping (address => bool) public isProxy;
+
+  event CreateDonation(string description, uint128 goal, address beneficiary, string taxId, address creator);
+  event MakeDonation(uint32 donationId, uint128 amount, address donor, address sender);
+  event IssueDonation(uint32 donationId, uint128 amount, address donor, address issuer);
+  event DeleteDonation(uint32 donationId);
+
+  modifier onlyProxy() {
+    require(isProxy[msg.sender]);
+    _;
+  }
 
   struct Donation {
     uint32 donationId;  // 4 bytes
@@ -43,7 +56,7 @@ contract DonationCore is ERC721BasicToken {
     donationBeneficiary[newDonationId] = _beneficiary;
     donationGoal[newDonationId] = _goal;
     donationTaxId[newDonationId] = _taxId;
-
+    CreateDonation(_description, _goal, _beneficiary, _taxId, msg.sender);
     return newDonationId;
   }
 
@@ -60,6 +73,7 @@ contract DonationCore is ERC721BasicToken {
     uint32 newDonationId = uint32(donations.push(_donation) - 1);
     _mint(_donor, newDonationId);
     totalDonations++;
+    MakeDonation(newDonationId, _amount, _donor, msg.sender);
     return newDonationId;
   }
 
@@ -75,7 +89,20 @@ contract DonationCore is ERC721BasicToken {
 
     uint32 newDonationId = uint32(donations.push(_donation) - 1);
     totalIssued++;
+    IssueDonation(_donationId, _amount, _donor, msg.sender);
     return newDonationId;
+  }
+
+  function _deleteDonation(uint32 _donationId)
+    internal
+  {
+    delete donations[_donationId];
+    donationDescription[_donationId] = "";
+    donationTaxId[_donationId] = "";
+    donationBeneficiary[_donationId] = address(0);
+    donationGoal[_donationId] = 0;
+    donationRaised[_donationId] = 0;
+    DeleteDonation(_donationId);
   }
 
 
