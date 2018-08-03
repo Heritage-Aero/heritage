@@ -106,11 +106,11 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     public
     onlyOwner
   {
-    delete donations[_donationId];
-    donationDescription[_donationId] = "";
-    donationTaxId[_donationId] = "";
-    donationBeneficiary[_donationId] = address(0);
-    donationGoal[_donationId] = 0;
-    donationRaised[_donationId] = 0;
+    // Cannot delete Genesis
+    require(_donationId > 0);
+    // Must delete an existing donation
+    require(_donationId < donations.length);
+
+    _deleteDonation(_donationId);
   }
 }

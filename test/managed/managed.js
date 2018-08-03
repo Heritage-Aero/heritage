@@ -40,18 +40,28 @@ contract('Managed', accounts => {
         isManager.should.be.equal(false);
       });
       it('Contract owner adds a new manager', async () => {
-        let receipt = await managed.addManager(mgr2);
-        receipt = await web3.eth.getTransactionReceipt(receipt.tx);
-        // console.log(receipt.gasUsed)
+        const txReceipt = await managed.addManager(mgr2);
+        const receipt = await web3.eth.getTransactionReceipt(txReceipt.tx);
+
         const isManager = await managed.isManager(mgr2);
         isManager.should.be.equal(true);
+
+        const logs = txReceipt.logs[0];
+
+        logs.event.should.be.equal('AddManager');
+        logs.args.manager.should.be.equal(mgr2);
       });
       it('Contract owner removes a manager', async () => {
-        let receipt = await managed.removeManager(mgr1);
-        receipt = await web3.eth.getTransactionReceipt(receipt.tx);
-        // console.log(receipt.gasUsed)
+        const txReceipt = await managed.removeManager(mgr1);
+        const receipt = await web3.eth.getTransactionReceipt(txReceipt.tx);
+
         const isManager = await managed.isManager(mgr1);
         isManager.should.be.equal(false);
+
+        const logs = txReceipt.logs[0];
+
+        logs.event.should.be.equal('RemoveManager');
+        logs.args.manager.should.be.equal(mgr1);
       });
       it('Manager calls a managersOnly function', async () => {
         await managed.managersOnly({from: mgr1});
