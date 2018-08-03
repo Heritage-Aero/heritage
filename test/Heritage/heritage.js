@@ -152,6 +152,16 @@ contract('Heritage', accounts => {
         (await heritage.totalRaised()).should.be.bignumber.equal(10e18);
         (await heritage.donationRaised(1)).should.be.bignumber.equal(10e18);
       });
+      it('Deletes a donation', async() => {
+        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+        await heritage.deleteDonation(1);
+
+        const d = await heritage.donations(1);
+
+        d[0].should.be.bignumber.equal(0);
+        d[1].should.be.bignumber.equal(0);
+        d[2].should.be.equal(zeroAddress);
+      })
       it('Makes a donation through a previous donation', async () => {
         await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
         await heritage.makeDonation(1, { value: 10e18, from: creator });
@@ -198,7 +208,6 @@ contract('Heritage', accounts => {
           heritage = await Heritage.new(true)
           await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
         })
-
         it('Fails if the donation amount is zero', async () => {
           await assertRevert(heritage.makeDonation(1, { value: 0, from: creator }));
         })
@@ -217,6 +226,15 @@ contract('Heritage', accounts => {
           heritageNoFiat.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
 
           await assertRevert(heritageNoFiat.issueDonation(1, 1000, zeroAddress));
+        })
+        it('Fails to donate if the donation has been deleted', async() => {
+          await heritage.makeDonation(1, { value: 10e18, from: creator });
+          await heritage.makeDonation(2, { value: 10e18, from: donor1 })
+
+          await heritage.deleteDonation(1);
+
+          await assertRevert(heritage.makeDonation(1, { value: 10e18, from: creator }));
+          await assertRevert(heritage.makeDonation(2, { value: 10e18, from: donor1 }));
         })
       })
     })

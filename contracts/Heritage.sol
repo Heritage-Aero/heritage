@@ -57,6 +57,8 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     // Lookup the original donation
     uint32 donationId = donations[_donationId].donationId;
 
+    // Cannot donate to deleted token/null address
+    require(donationBeneficiary[donationId] != address(0));
     // A goal of 0 is uncapped
     if (donationGoal[donationId] > 0) {
       // It must not have reached it's goal
@@ -98,5 +100,17 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     uint32 donationId = donations[_donationId].donationId;
 
     return _issueDonation(donationId, _amount, _donor);
+  }
+
+  function deleteDonation(uint32 _donationId)
+    public
+    onlyOwner
+  {
+    delete donations[_donationId];
+    donationDescription[_donationId] = "";
+    donationTaxId[_donationId] = "";
+    donationBeneficiary[_donationId] = address(0);
+    donationGoal[_donationId] = 0;
+    donationRaised[_donationId] = 0;
   }
 }
