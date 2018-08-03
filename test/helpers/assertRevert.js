@@ -1,11 +1,12 @@
 export default async promise => {
   try {
-    await promise
-    assert.fail('Expected revert not received')
+    await promise;
   } catch (error) {
-    const revertFound = error.message.search('revert') >= 0
-    assert(revertFound, `Expected "revert", got ${error} instead`)
+    const revertFound = error.message.search('revert') >= 0;
+    assert(revertFound, `Expected "revert", got ${error} instead`);
+    return;
   }
+  assert.fail('Expected revert not received');
 }
 
 export const assertError = promise => {
@@ -13,3 +14,4 @@ export const assertError = promise => {
     promise.should.be.rejected
   ])
 }
+

@@ -8,14 +8,22 @@ import './Managed.sol';
 import './DonationCore.sol';
 
 // Needs gas opti
-contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, DonationCore {
+contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, DonationCore {
+  bool public issueDonationEnabled = false;
 
-  constructor() public payable {
+  modifier issueDonationIsEnabled() {
+    require(issueDonationEnabled);
+    _;
+  }
+
+  constructor(bool enableIssueDonation) public payable {
     require(msg.value == 0);
+
+    issueDonationEnabled = enableIssueDonation;
 
     _createDonation("Genesis Donation", 0, this, "");
   }
-
+  // Starting point for donations to a beneficiary
   function createDonation(
     string _description,
     uint128 _goal,
@@ -30,7 +38,8 @@ contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, Donatio
     require(donations.length < 4294967296 - 1); // 2^32-1
     return _createDonation(_description, _goal, _beneficiary, _taxId);
   }
-
+  // Make a donation based on Id.
+  // Donate directly or proxy through another donation.
   function makeDonation(uint32 _donationId)
     public
     payable
@@ -66,6 +75,28 @@ contract Notarizer is Ownable, NoOwner, Pausable, Destructible, Managed, Donatio
     // Update the total amount the contract has raised
     totalRaised += amount;
 
-    return _makeDonation(donationId, amount);
+    return _makeDonation(donationId, amount, msg.sender);
+  }
+
+  // Managers may issue donations directly. A way to accept fiat donations
+  // and credit an address. Optional -- disable/enable at deployment.
+  // Does not effect contract totals. Must issue to a created donation.
+  function issueDonation(uint32 _donationId, uint128 _amount, address _donor)
+    public
+    onlyManagers
+    issueDonationIsEnabled
+    whenNotPaused
+    returns (uint256)
+  {
+    // Cannot donate to Genesis
+    require(_donationId > 0);
+    // Must donate to an existing donation
+    require(_donationId < donations.length);
+    // 2^32-1
+    require(donations.length < 4294967296 - 1);
+    // Lookup the original donation
+    uint32 donationId = donations[_donationId].donationId;
+
+    return _issueDonation(donationId, _amount, _donor);
   }
 }

@@ -7,6 +7,7 @@ contract DonationCore is ERC721BasicToken {
   Donation[] public donations;
   uint128 public totalRaised;
   uint128 public totalDonations;
+  uint128 public totalIssued;
 
   mapping (uint32 => string) public donationDescription;
   mapping (uint32 => string) public donationTaxId;
@@ -46,21 +47,37 @@ contract DonationCore is ERC721BasicToken {
     return newDonationId;
   }
 
-  function _makeDonation(uint32 _donationId, uint128 _amount)
+  function _makeDonation(uint32 _donationId, uint128 _amount, address _donor)
     internal
     returns (uint256)
   {
     Donation memory _donation = Donation({
       donationId: _donationId,
       amount: _amount,
-      donor: msg.sender
+      donor: _donor
     });
 
     uint32 newDonationId = uint32(donations.push(_donation) - 1);
-    _mint(msg.sender, newDonationId);
+    _mint(_donor, newDonationId);
     totalDonations++;
     return newDonationId;
   }
+
+  function _issueDonation(uint32 _donationId, uint128 _amount, address _donor)
+    internal
+    returns (uint256)
+  {
+    Donation memory _donation = Donation({
+      donationId: _donationId,
+      amount: _amount,
+      donor: _donor
+    });
+
+    uint32 newDonationId = uint32(donations.push(_donation) - 1);
+    totalIssued++;
+    return newDonationId;
+  }
+
 
   function name() external pure returns (string _name) {
     _name = "Heritage";
@@ -72,6 +89,7 @@ contract DonationCore is ERC721BasicToken {
 
   function getDonation(uint32 _id) external view
     returns (
+      uint32 _originalDonationId,
       uint32 _donationId,
       string _description,
       uint128 _goal,
@@ -84,6 +102,7 @@ contract DonationCore is ERC721BasicToken {
 
         uint32 donationId = donations[_id].donationId;
 
+        _originalDonationId = donationId;
         _donationId = _id;
         _description = donationDescription[donationId];
         _goal = donationGoal[donationId];
@@ -94,11 +113,15 @@ contract DonationCore is ERC721BasicToken {
         _taxId = donationTaxId[donationId];
   }
 
+  function totalDonationsCreated() external view returns (uint256 _totalDonations) {
+    _totalDonations = donations.length - totalDonations;
+  }
+
   function totalDonationsMade() external view returns (uint256 _totalDonations) {
     _totalDonations = totalDonations;
   }
 
-  function totalDonationsCreated() external view returns (uint256 _totalDonations) {
-    _totalDonations = donations.length - totalDonations;
+  function totalDonationsIssued() external view returns (uint256 _totalDonations) {
+    _totalDonations = totalIssued;
   }
 }

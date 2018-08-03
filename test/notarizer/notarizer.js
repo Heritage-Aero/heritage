@@ -2,7 +2,7 @@ import assertRevert, { assertError } from '../helpers/assertRevert'
 
 const BigNumber = web3.BigNumber
 
-const Notarizer = artifacts.require('Notarizer')
+const Heritage = artifacts.require('Heritage')
 
 require('chai')
   .use(require('chai-as-promised'))
@@ -11,148 +11,212 @@ require('chai')
 
 const expect = require('chai').expect
 
-contract('Notarizer', accounts => {
+contract('Heritage', accounts => {
   const [creator, donor1, donor2, donor3, donor4] = accounts
   const charity = "0x4f403d6dc030eb171f60d990840de3ac4527215f";
   const taxId = '46-0192831';
-  let notary = null
+  let heritage = null
+  let heritageNoFiat = null
   const donationsToCreate = 5;
   const zeroAddress = "0x0000000000000000000000000000000000000000";
   const genesisDonationName = "Genesis Donation";
   const oneEther = 10e17;
 
   beforeEach(async () => {
-    notary = await Notarizer.new()
+    heritage = await Heritage.new(true)
+    heritageNoFiat = await Heritage.new(false)
   })
 
   describe('Tests', () => {
 
     describe('Notary', async () => {
       it('Has a name.', async () => {
-        const name = await notary.name();
+        const name = await heritage.name();
 
         name.should.be.equal("Heritage");
       });
       it('Has a symbol.', async () => {
-        const name = await notary.symbol();
+        const name = await heritage.symbol();
 
         name.should.be.equal("A^3");
       });
       it('Has a contract owner.', async () => {
-        const owner = await notary.owner();
+        const owner = await heritage.owner();
 
         owner.should.be.equal(creator);
       });
+      it('Has issueDonationEnabled set to true.', async() => {
+        const enabled = await heritage.issueDonationEnabled();
+
+        enabled.should.be.equal(true);
+      })
+      it('Has getDonation', async() => {
+        const genesisDonation = await heritage.getDonation(0);
+      })
       it('Has a Genesis Donation.', async () => {
-        const genesisDonation = await notary.getDonation(0);
+        const genesisDonation = await heritage.getDonation(0);
 
         genesisDonation[0].should.be.bignumber.equal(0);
-        genesisDonation[1].should.be.equal("Genesis Donation");
-        genesisDonation[2].should.be.bignumber.equal(0);
+        genesisDonation[1].should.be.bignumber.equal(0);
+        genesisDonation[2].should.be.equal("Genesis Donation");
         genesisDonation[3].should.be.bignumber.equal(0);
         genesisDonation[4].should.be.bignumber.equal(0);
-        genesisDonation[5].should.be.equal((await notary.address));
-        genesisDonation[6].should.be.equal(zeroAddress);
-        genesisDonation[7].should.be.equal("");
-      });
-      it('Creates a Donation.', async () => {
-        await notary.createDonation("10 Laptops", 10*10e18, charity, taxId);
-        const donation = await notary.getDonation(1);
-
-        donation[0].should.be.bignumber.equal(1);
-        donation[1].should.be.equal("10 Laptops");
-        donation[2].should.be.bignumber.equal(10*10e18);
-        donation[3].should.be.bignumber.equal(0);
-        donation[4].should.be.bignumber.equal(0);
-        donation[5].should.be.equal(charity);
-        donation[6].should.be.equal(zeroAddress);
-        donation[7].should.be.equal(taxId);
-
-        (await notary.donationGoal(1)).should.be.bignumber.equal(10 * 10e18);
-        (await notary.donationRaised(1)).should.be.bignumber.equal(0);
+        genesisDonation[5].should.be.bignumber.equal(0);
+        genesisDonation[6].should.be.equal((await heritage.address));
+        genesisDonation[7].should.be.equal(zeroAddress);
+        genesisDonation[8].should.be.equal("");
       });
       it('Has totalDonationsCreated', async () => {
-        const created = await notary.totalDonationsCreated();
+        let created = await heritage.totalDonationsCreated();
         created.should.be.bignumber.equal(1);
+        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+
+        created = await heritage.totalDonationsCreated();
+        created.should.be.bignumber.equal(2);
+
+        await heritage.makeDonation(1, { value: 10e18, from: creator });
+        await heritage.makeDonation(1, { value: 10e18, from: creator });
+        await heritage.makeDonation(1, { value: 10e18, from: creator });
+
+        created = await heritage.totalDonationsCreated();
+        created.should.be.bignumber.equal(2);
       })
       it('Has totalDonationsMade', async () => {
-        const created = await notary.totalDonationsMade();
+        let created = await heritage.totalDonationsMade();
         created.should.be.bignumber.equal(0);
+
+        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+        await heritage.makeDonation(1, { value: 10e18, from: creator });
+        await heritage.makeDonation(1, { value: 10e18, from: creator });
+        await heritage.makeDonation(1, { value: 10e18, from: creator });
+
+        created = await heritage.totalDonationsMade();
+        created.should.be.bignumber.equal(3);
+      })
+      it('Has totalDonationsIssued', async () => {
+        let created = await heritage.totalDonationsIssued();
+        created.should.be.bignumber.equal(0);
+
+        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+        await heritage.issueDonation(1, 1000, zeroAddress);
+
+        created = await heritage.totalDonationsIssued();
+        created.should.be.bignumber.equal(1);
+      })
+      it('Creates a Donation.', async () => {
+        await heritage.createDonation("10 Laptops", 10*10e18, charity, taxId);
+        const donation = await heritage.getDonation(1);
+
+        donation[0].should.be.bignumber.equal(1);
+        donation[1].should.be.bignumber.equal(1);
+        donation[2].should.be.equal("10 Laptops");
+        donation[3].should.be.bignumber.equal(10*10e18);
+        donation[4].should.be.bignumber.equal(0);
+        donation[5].should.be.bignumber.equal(0);
+        donation[6].should.be.equal(charity);
+        donation[7].should.be.equal(zeroAddress);
+        donation[8].should.be.equal(taxId);
+      });
+      it('Issues a Donation', async() => {
+        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+        await heritage.issueDonation(1, 1000, zeroAddress);
+
+        const donation = await heritage.getDonation(2);
+
+        donation[0].should.be.bignumber.equal(1);
+        donation[1].should.be.bignumber.equal(2);
+        donation[2].should.be.equal("10 Laptops");
+        donation[3].should.be.bignumber.equal(10 * 10e18);
+        donation[4].should.be.bignumber.equal(0);
+        donation[5].should.be.bignumber.equal(1000);
+        donation[6].should.be.equal(charity);
+        donation[7].should.be.equal(zeroAddress);
+        donation[8].should.be.equal(taxId);
       })
       it('Makes a donation', async () => {
-        await notary.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-        await notary.makeDonation(1, {value: 10e18, from: creator});
-        const donation = await notary.getDonation(2);
+        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+        await heritage.makeDonation(1, {value: 10e18, from: creator});
+        const donation = await heritage.getDonation(2);
 
-        donation[0].should.be.bignumber.equal(2);
-        donation[1].should.be.equal("10 Laptops");
-        donation[2].should.be.bignumber.equal(10 * 10e18);
-        donation[3].should.be.bignumber.equal(10e18);
+        donation[0].should.be.bignumber.equal(1);
+        donation[1].should.be.bignumber.equal(2);
+        donation[2].should.be.equal("10 Laptops");
+        donation[3].should.be.bignumber.equal(10 * 10e18);
         donation[4].should.be.bignumber.equal(10e18);
-        donation[5].should.be.equal(charity);
-        donation[6].should.be.equal(creator);
-        donation[7].should.be.equal(taxId);
+        donation[5].should.be.bignumber.equal(10e18);
+        donation[6].should.be.equal(charity);
+        donation[7].should.be.equal(creator);
+        donation[8].should.be.equal(taxId);
 
-        (await notary.ownerOf(2)).should.be.equal(creator);
-        (await notary.totalRaised()).should.be.bignumber.equal(10e18);
-        (await notary.donationRaised(1)).should.be.bignumber.equal(10e18);
+        (await heritage.ownerOf(2)).should.be.equal(creator);
+        (await heritage.totalRaised()).should.be.bignumber.equal(10e18);
+        (await heritage.donationRaised(1)).should.be.bignumber.equal(10e18);
       });
       it('Makes a donation through a previous donation', async () => {
-        await notary.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-        await notary.makeDonation(1, { value: 10e18, from: creator });
-        await notary.makeDonation(2, { value: 10e18, from: donor1 });
+        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+        await heritage.makeDonation(1, { value: 10e18, from: creator });
+        await heritage.makeDonation(2, { value: 10e18, from: donor1 });
 
-        const donation = await notary.getDonation(3);
+        const donation = await heritage.getDonation(3);
 
-        donation[0].should.be.bignumber.equal(3);
-        donation[1].should.be.equal("10 Laptops");
-        donation[2].should.be.bignumber.equal(10 * 10e18);
-        donation[3].should.be.bignumber.equal(2 * 10e18);
-        donation[4].should.be.bignumber.equal(10e18);
-        donation[5].should.be.equal(charity);
-        donation[6].should.be.equal(donor1);
-        donation[7].should.be.equal(taxId);
+        donation[0].should.be.bignumber.equal(1);
+        donation[1].should.be.bignumber.equal(3);
+        donation[2].should.be.equal("10 Laptops");
+        donation[3].should.be.bignumber.equal(10 * 10e18);
+        donation[4].should.be.bignumber.equal(2 * 10e18);
+        donation[5].should.be.bignumber.equal(10e18);
+        donation[6].should.be.equal(charity);
+        donation[7].should.be.equal(donor1);
+        donation[8].should.be.equal(taxId);
 
-        (await notary.ownerOf(3)).should.be.equal(donor1);
+        (await heritage.ownerOf(3)).should.be.equal(donor1);
 
-        (await notary.ownerOf(2)).should.be.equal(creator);
-        (await notary.totalRaised()).should.be.bignumber.equal(2*10e18);
+        (await heritage.ownerOf(2)).should.be.equal(creator);
+        (await heritage.totalRaised()).should.be.bignumber.equal(2*10e18);
 
-        const donation1Raised = (await notary.donationRaised(1)).toNumber();
-        const donation2Raised = (await notary.donationRaised(2)).toNumber();
+        const donation1Raised = (await heritage.donationRaised(1)).toNumber();
+        const donation2Raised = (await heritage.donationRaised(2)).toNumber();
 
         donation1Raised.should.be.equal(2*10e18);
         donation2Raised.should.be.equal(10e18);
       });
       it('Creates uncapped donation', async() => {
-        await notary.createDonation("10 Laptops", 0, charity, taxId);
+        await heritage.createDonation("10 Laptops", 0, charity, taxId);
 
-        await notary.makeDonation(1, { value: 10e18, from: donor1 });
-        await notary.makeDonation(1, { value: 10e18, from: donor1 });
+        await heritage.makeDonation(1, { value: 10e18, from: donor1 });
+        await heritage.makeDonation(1, { value: 10e18, from: donor1 });
 
-        const donation1Raised = (await notary.donationRaised(1)).toNumber();
-        const donation1Goal = (await notary.donationGoal(1)).toNumber();
+        const donation1Raised = (await heritage.donationRaised(1)).toNumber();
+        const donation1Goal = (await heritage.donationGoal(1)).toNumber();
 
         donation1Raised.should.be.equal(2 * 10e18);
         donation1Goal.should.be.equal(0);
       })
 
-
       context('User Fail Cases', async () => {
+        beforeEach(async () => {
+          heritage = await Heritage.new(true)
+          await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+        })
+
         it('Fails if the donation amount is zero', async () => {
-          await assertRevert(notary.makeDonation(1, { value: 0, from: creator }));
+          await assertRevert(heritage.makeDonation(1, { value: 0, from: creator }));
         })
         it('Fails if the donation is for the Genesis Donation', async () => {
-          await assertRevert(notary.makeDonation(0, { value: 10e18, from: creator }));
+          await assertRevert(heritage.makeDonation(0, { value: 10e18, from: creator }));
         })
         it('Fails if the donation does not exist', async () => {
-          await assertRevert(notary.makeDonation(10, { value: 10e18, from: creator }));
+          await assertRevert(heritage.makeDonation(10, { value: 10e18, from: creator }));
         })
         it('Fails if the donation has reached its goal', async () => {
-          await notary.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-          await notary.makeDonation(1, { value: 10*10e18, from: creator });
-          await assertRevert(notary.makeDonation(1, { value: 10e18, from: creator }));
-          await assertRevert(notary.makeDonation(2, { value: 10e18, from: creator }));
+          await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+          await heritage.makeDonation(1, { value: 10*10e18, from: creator });
+          await assertRevert(heritage.makeDonation(1, { value: 10e18, from: creator }));
+        })
+        it("Fails to issue a donation if issueDonationEnabled is false", async() => {
+          heritageNoFiat.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
+
+          await assertRevert(heritageNoFiat.issueDonation(1, 1000, zeroAddress));
         })
       })
     })

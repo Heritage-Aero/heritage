@@ -2,7 +2,7 @@ import assertRevert, { assertError } from '../helpers/assertRevert'
 
 const BigNumber = web3.BigNumber
 
-const Notarizer = artifacts.require('Notarizer')
+const Heritage = artifacts.require('Heritage')
 
 require('chai')
   .use(require('chai-as-promised'))
@@ -11,7 +11,7 @@ require('chai')
 
 const expect = require('chai').expect
 
-contract('Notarizer', accounts => {
+contract('Heritage', accounts => {
   const [creator, donor1, donor2, donor3, donor4] = accounts
   const charity = "0x4f403d6dc030eb171f60d990840de3ac4527215f";
   const taxId = '46-0192831';
@@ -22,12 +22,12 @@ contract('Notarizer', accounts => {
   const oneEther = 10e17;
 
   beforeEach(async () => {
-    notary = await Notarizer.new()
+    notary = await Heritage.new(true)
     await notary.createDonation(`Campaign-2`, 10e18, charity, taxId)
   })
 
   describe('Tests', () => {
-    describe('Notary', async () => {
+    describe('Heritage', async () => {
       it('Cost for creating a donation', async() => {
         let receipt = await notary.createDonation(`Campaign-2`, 10e18, charity, taxId);
         receipt = await web3.eth.getTransactionReceipt(receipt.tx);
@@ -35,6 +35,12 @@ contract('Notarizer', accounts => {
       })
       it('Cost for making a donation', async() => {
         let receipt = await notary.makeDonation(1, { value: 10e18, from: creator });
+
+        receipt = await web3.eth.getTransactionReceipt(receipt.tx);
+        console.log(receipt.gasUsed)
+      })
+      it('Cost for issuing a donation', async() => {
+        let receipt = await notary.issueDonation(1, 1000, zeroAddress);
 
         receipt = await web3.eth.getTransactionReceipt(receipt.tx);
         console.log(receipt.gasUsed)
