@@ -1,10 +1,11 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
-import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 
-contract Managed is Ownable{
 
-  mapping(address => bool) managers;
+contract Managed is Ownable {
+
+  mapping(address => bool) public managers;
 
   event AddManager(address manager);
   event RemoveManager(address manager);

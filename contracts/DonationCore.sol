@@ -1,6 +1,7 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
-import 'zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol';
+import "zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol";
+
 
 contract DonationCore is ERC721BasicToken {
   // Soft cap of 4,294,967,295 (2^32-1)
@@ -32,6 +33,52 @@ contract DonationCore is ERC721BasicToken {
     uint32 donationId;  // 4 bytes
     uint128 amount;     // 16 bytes
     address donor;      // 20 bytes
+  }
+
+  function name() external pure returns (string _name) {
+    _name = "Heritage";
+  }
+
+  function symbol() external pure returns (string _symbol) {
+    _symbol = "A^3";
+  }
+
+  function getDonation(uint32 _id) external view
+    returns (
+      uint32 _originalDonationId,
+      uint32 _donationId,
+      string _description,
+      uint128 _goal,
+      uint128 _raised,
+      uint128 _amount,
+      address _beneficiary,
+      address _donor,
+      string _taxId
+      ) {
+
+        uint32 donationId = donations[_id].donationId;
+
+        _originalDonationId = donationId;
+        _donationId = _id;
+        _description = donationDescription[donationId];
+        _goal = donationGoal[donationId];
+        _raised = donationRaised[donationId];
+        _amount = donations[_id].amount;
+        _beneficiary = donationBeneficiary[donationId];
+        _donor = donations[_id].donor;
+        _taxId = donationTaxId[donationId];
+  }
+
+  function totalDonationsCreated() external view returns (uint256 _totalDonations) {
+    _totalDonations = donations.length - totalDonations;
+  }
+
+  function totalDonationsMade() external view returns (uint256 _totalDonations) {
+    _totalDonations = totalDonations;
+  }
+
+  function totalDonationsIssued() external view returns (uint256 _totalDonations) {
+    _totalDonations = totalIssued;
   }
 
   function _createDonation(
@@ -107,52 +154,5 @@ contract DonationCore is ERC721BasicToken {
     donationRaised[_donationId] = 0;
 
     DeleteDonation(_donationId);
-  }
-
-
-  function name() external pure returns (string _name) {
-    _name = "Heritage";
-  }
-
-  function symbol() external pure returns (string _symbol) {
-    _symbol = "A^3";
-  }
-
-  function getDonation(uint32 _id) external view
-    returns (
-      uint32 _originalDonationId,
-      uint32 _donationId,
-      string _description,
-      uint128 _goal,
-      uint128 _raised,
-      uint128 _amount,
-      address _beneficiary,
-      address _donor,
-      string _taxId
-      ) {
-
-        uint32 donationId = donations[_id].donationId;
-
-        _originalDonationId = donationId;
-        _donationId = _id;
-        _description = donationDescription[donationId];
-        _goal = donationGoal[donationId];
-        _raised = donationRaised[donationId];
-        _amount = donations[_id].amount;
-        _beneficiary = donationBeneficiary[donationId];
-        _donor = donations[_id].donor;
-        _taxId = donationTaxId[donationId];
-  }
-
-  function totalDonationsCreated() external view returns (uint256 _totalDonations) {
-    _totalDonations = donations.length - totalDonations;
-  }
-
-  function totalDonationsMade() external view returns (uint256 _totalDonations) {
-    _totalDonations = totalDonations;
-  }
-
-  function totalDonationsIssued() external view returns (uint256 _totalDonations) {
-    _totalDonations = totalIssued;
   }
 }
