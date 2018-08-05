@@ -49,6 +49,12 @@ contract('Heritage', accounts => {
         receipt = await web3.eth.getTransactionReceipt(receipt.tx);
         console.log(receipt.gasUsed)
       })
+      it('Cost for deleting a donation', async() => {
+        let receipt = await notary.deleteDonation(1);
+
+        receipt = await web3.eth.getTransactionReceipt(receipt.tx);
+        console.log(receipt.gasUsed)
+      })
     })
   })
 })
