@@ -4,13 +4,14 @@ import "zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol";
 
 
 // Todo
-// Destroy Proxy
-// Mock Proxy
+// Destroy Proxy once goal is met
 contract Proxy {
   DonationCore donationCore;
   uint32 donationId;
 
-  constructor(uint32 _donationId) {
+  constructor(uint32 _donationId) public payable {
+    require(msg.value == 0);
+
     donationId = _donationId;
     donationCore = DonationCore(msg.sender);
   }
