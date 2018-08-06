@@ -1,13 +1,13 @@
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
-import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
-import 'zeppelin-solidity/contracts/lifecycle/Pausable.sol';
-import 'zeppelin-solidity/contracts/lifecycle/Destructible.sol';
-import 'zeppelin-solidity/contracts/ownership/NoOwner.sol';
-import './Managed.sol';
-import './DonationCore.sol';
+import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
+import "zeppelin-solidity/contracts/ownership/NoOwner.sol";
+import "./Managed.sol";
+import "./DonationCore.sol";
 
-// Needs gas opti
+
 contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, DonationCore {
   bool public issueDonationEnabled = false;
 
@@ -23,7 +23,7 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
 
     _createDonation("Genesis Donation", 0, this, "");
   }
-  // Starting point for donations to a beneficiary
+
   function createDonation(
     string _description,
     uint128 _goal,
@@ -38,6 +38,7 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     require(donations.length < 4294967296 - 1); // 2^32-1
     return _createDonation(_description, _goal, _beneficiary, _taxId);
   }
+
   // Make a donation based on Id.
   // Donate directly or proxy through another donation.
   function makeDonation(uint32 _donationId)
