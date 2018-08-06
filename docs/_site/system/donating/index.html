@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Donating | Heritage</title>
+<meta name="generator" content="Jekyll v3.7.2" />
+<meta property="og:title" content="Donating" />
+<meta name="author" content="Alex Sherbuck" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Making Donations" />
+<meta property="og:description" content="Making Donations" />
+<link rel="canonical" href="http://localhost:4000/system/donating/" />
+<meta property="og:url" content="http://localhost:4000/system/donating/" />
+<meta property="og:site_name" content="Heritage" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-08-06T07:16:35+00:00" />
+<script type="application/ld+json">
+{"description":"Making Donations","author":{"@type":"Person","name":"Alex Sherbuck"},"@type":"Article","url":"http://localhost:4000/system/donating/","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/siteicon.png"},"name":"Alex Sherbuck"},"headline":"Donating","dateModified":"2018-08-06T07:16:35+00:00","datePublished":"2018-08-06T07:16:35+00:00","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+		<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Heritage" />
+
+		<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Open+Sans:400,400italic,600,600italic,700,700italic|Inconsolata:400,700">
+		<link rel="stylesheet" href="/css/main.css">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" href="/touch-icon.png" sizes="192x192">
+		<link rel="icon" type="image/png" href="/images/favicon.png">
+
+		
+	</head>
+
+	<body>
+		<header>
+			<h1>
+				<a href="/"><img src="/images/logo.png" alt="Heritage logo"></a>
+
+				<button type="button" class="open-nav" id="open-nav"></button>
+			</h1>
+
+
+			<nav class="full-navigation">
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/">Getting Started</a>
+					</li>
+				</ul>
+
+				<ul>
+					
+					
+						<li class="nav-item top-level ">
+							
+							<a href="/architecture/architecture/">Architecture</a>
+							<ul>
+								
+									<li class="nav-item "><a href="/architecture/architecture/">Overview</a></li>
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level current">
+							
+							<a href="/system/users/">Heritage</a>
+							<ul>
+								
+									<li class="nav-item "><a href="/system/users/">Users</a></li>
+								
+									<li class="nav-item "><a href="/system/deployment/">Deployment</a></li>
+								
+									<li class="nav-item "><a href="/system/creating/">Donation Management</a></li>
+								
+									<li class="nav-item current"><a href="/system/donating/">Donating</a></li>
+								
+							</ul>
+						</li>
+					
+				</ul>
+
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/changelog/"></a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+
+		<section class="main">
+			<div class="page-header">
+				<h2>Heritage</h2>
+				<h3>Donating</h3>
+			</div>
+			<article class="content">
+				<h2 id="making-donations">Making Donations</h2>
+
+<p>Donors interacting with Heritage will call a makeDonation function and provide the donation id as a parameter. Heritage will mint an ERC-721 donation for the amount of ETH sent by the sender’s address. The donor’s token will reference the donation id of the original donation token.</p>
+
+<h2 id="donation-chaining">Donation Chaining</h2>
+<p>If a donation is sent to a donor token, or token that was not created by a manager, the donation is treated as if sent to the original donation token. However, the child token is recorded as having raised some ETH for the original donation token.</p>
+
+<p>This allows for others to raise funds on behalf of the beneficiary and receive a recognition.</p>
+
+<h2 id="proxy-donations">Proxy Donations</h2>
+<p>To facilitate donations without requiring MetaMask we can launch a proxy contract for a donation. In the proxy contract payable fallback we call a function similar to makeDonation that credits the original sender address. Anyone may launch a proxy for any donation that does not already have a proxy.</p>
+
+<blockquote>
+  <p><em>Proxy Donation Cons</em></p>
+  <ol>
+    <li>Exchange addresses credit exchange, not user (Exchange holds keys)</li>
+    <li>Additional deployment gas/cost (Small)</li>
+    <li>Additional gas cost to create a donation</li>
+  </ol>
+</blockquote>
+
+			</article>
+		</section>
+
+		<script>
+			document.getElementById("open-nav").addEventListener("click", function () {
+				document.body.classList.toggle("nav-open");
+			});
+		</script>
+	</body>
+</html>
