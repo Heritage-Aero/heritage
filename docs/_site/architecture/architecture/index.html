@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Overview | Heritage</title>
+<meta name="generator" content="Jekyll v3.7.2" />
+<meta property="og:title" content="Overview" />
+<meta name="author" content="Alex Sherbuck" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Ethereum Smart Contracts developed by Airbus" />
+<meta property="og:description" content="Ethereum Smart Contracts developed by Airbus" />
+<link rel="canonical" href="http://localhost:4000/architecture/architecture/" />
+<meta property="og:url" content="http://localhost:4000/architecture/architecture/" />
+<meta property="og:site_name" content="Heritage" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-08-06T07:16:35+00:00" />
+<script type="application/ld+json">
+{"description":"Ethereum Smart Contracts developed by Airbus","author":{"@type":"Person","name":"Alex Sherbuck"},"@type":"Article","url":"http://localhost:4000/architecture/architecture/","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/siteicon.png"},"name":"Alex Sherbuck"},"headline":"Overview","dateModified":"2018-08-06T07:16:35+00:00","datePublished":"2018-08-06T07:16:35+00:00","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+		<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Heritage" />
+
+		<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Open+Sans:400,400italic,600,600italic,700,700italic|Inconsolata:400,700">
+		<link rel="stylesheet" href="/css/main.css">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" href="/touch-icon.png" sizes="192x192">
+		<link rel="icon" type="image/png" href="/images/favicon.png">
+
+		
+	</head>
+
+	<body>
+		<header>
+			<h1>
+				<a href="/"><img src="/images/logo.png" alt="Heritage logo"></a>
+
+				<button type="button" class="open-nav" id="open-nav"></button>
+			</h1>
+
+
+			<nav class="full-navigation">
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/">Getting Started</a>
+					</li>
+				</ul>
+
+				<ul>
+					
+					
+						<li class="nav-item top-level current">
+							
+							<a href="/architecture/architecture/">Architecture</a>
+							<ul>
+								
+									<li class="nav-item current"><a href="/architecture/architecture/">Overview</a></li>
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level ">
+							
+							<a href="/system/users/">Heritage</a>
+							<ul>
+								
+									<li class="nav-item "><a href="/system/users/">Users</a></li>
+								
+									<li class="nav-item "><a href="/system/deployment/">Deployment</a></li>
+								
+									<li class="nav-item "><a href="/system/creating/">Donation Management</a></li>
+								
+									<li class="nav-item "><a href="/system/donating/">Donating</a></li>
+								
+							</ul>
+						</li>
+					
+				</ul>
+
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/changelog/"></a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+
+		<section class="main">
+			<div class="page-header">
+				<h2>Architecture</h2>
+				<h3>Overview</h3>
+			</div>
+			<article class="content">
+				<p><img src="https://raw.githubusercontent.com/Heritage-Aero/heritage/master/imgs/HeritageContractArchitecture.jpg?token=AF_omn3ZUYxFagxISShefFdpMOuvccyqks5bcFjOwA%3D%3D" alt="Diagram" /></p>
+
+<h2 id="contracts">Contracts</h2>
+
+<ol>
+  <li>Heritage.sol
+    <ul>
+      <li>Provides the public interface to create, donate to and issue donations. Issue donations feature defaults to disabled and the enableIssueDonation flag is set at deployment.</li>
+    </ul>
+  </li>
+  <li>Managed.sol
+    <ul>
+      <li>Provides the contract owner with the means to add/remove addresses from a list of managers. Provides the onlyManagers function modifier.</li>
+    </ul>
+  </li>
+  <li>DonationCore.sol
+    <ul>
+      <li>Provides the business logic for creating, issuing and making donations. Tracks donation ownership using OpenZeppelin’s
+ERC721BasicToken.sol.</li>
+    </ul>
+  </li>
+</ol>
+
+<h2 id="erc-721-donation">ERC-721 Donation</h2>
+<p>Mappings in DonationCore track each donation’s description, tax identifier, beneficiary, goal, and amount raised. A Donation struct containing the donation id, donation amount and original donor address is tracked as an ERC-721 asset.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  struct Donation {
+    uint32 donationId;  // 4 bytes
+    uint128 amount;     // 16 bytes
+    address donor;      // 20 bytes
+  }
+</code></pre></div></div>
+
+			</article>
+		</section>
+
+		<script>
+			document.getElementById("open-nav").addEventListener("click", function () {
+				document.body.classList.toggle("nav-open");
+			});
+		</script>
+	</body>
+</html>

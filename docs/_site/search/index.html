@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Search | Heritage</title>
+<meta name="generator" content="Jekyll v3.7.2" />
+<meta property="og:title" content="Search" />
+<meta name="author" content="Alex Sherbuck" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Ethereum Smart Contracts developed by Airbus" />
+<meta property="og:description" content="Ethereum Smart Contracts developed by Airbus" />
+<link rel="canonical" href="http://localhost:4000/search/" />
+<meta property="og:url" content="http://localhost:4000/search/" />
+<meta property="og:site_name" content="Heritage" />
+<script type="application/ld+json">
+{"description":"Ethereum Smart Contracts developed by Airbus","author":{"@type":"Person","name":"Alex Sherbuck"},"@type":"WebPage","url":"http://localhost:4000/search/","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/siteicon.png"},"name":"Alex Sherbuck"},"headline":"Search","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+		<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Heritage" />
+
+		<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Open+Sans:400,400italic,600,600italic,700,700italic|Inconsolata:400,700">
+		<link rel="stylesheet" href="/css/main.css">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" href="/touch-icon.png" sizes="192x192">
+		<link rel="icon" type="image/png" href="/images/favicon.png">
+
+		
+	</head>
+
+	<body>
+		<header>
+			<h1>
+				<a href="/"><img src="/images/logo.png" alt="Heritage logo"></a>
+
+				<button type="button" class="open-nav" id="open-nav"></button>
+			</h1>
+
+
+			<nav class="full-navigation">
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/">Getting Started</a>
+					</li>
+				</ul>
+
+				<ul>
+					
+					
+						<li class="nav-item top-level ">
+							
+							<a href="/architecture/architecture/">Architecture</a>
+							<ul>
+								
+									<li class="nav-item "><a href="/architecture/architecture/">Overview</a></li>
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level ">
+							
+							<a href="/system/users/">Heritage</a>
+							<ul>
+								
+									<li class="nav-item "><a href="/system/users/">Users</a></li>
+								
+									<li class="nav-item "><a href="/system/deployment/">Deployment</a></li>
+								
+									<li class="nav-item "><a href="/system/creating/">Donation Management</a></li>
+								
+									<li class="nav-item "><a href="/system/donating/">Donating</a></li>
+								
+							</ul>
+						</li>
+					
+				</ul>
+
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/changelog/"></a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+
+		<section class="main">
+			<div class="page-header">
+				<h2>Heritage</h2>
+				<h3>Search</h3>
+			</div>
+			<article class="content">
+				<p><span id="search-process">Loading</span> results <span id="search-query-container" style="display: none;">for "<strong id="search-query"></strong>"</span></p>
+<ul id="search-results"></ul>
+
+<script>
+	window.data = {
+		
+			
+				
+					
+					
+
+					"architecture-architecture": {
+						"id": "architecture-architecture",
+						"title": "Overview",
+						"category": "",
+						"url": " /architecture/architecture/",
+						"content": "Contracts Heritage.sol Provides the public interface to create, donate to and issue donations. Issue donations feature defaults to disabled and the enableIssueDonation flag is set at deployment. Managed.sol Provides the contract owner with the means to add remove addresses from a list of managers. Provides the onlyManagers function modifier. DonationCore.sol Provides the business logic for creating, issuing and making donations. Tracks donation ownership using OpenZeppelin’s ERC721BasicToken.sol. ERC-721 Donation Mappings in DonationCore track each donation’s description, tax identifier, beneficiary, goal, and amount raised. A Donation struct containing the donation id, donation amount and original donor address is tracked as an ERC-721 asset. struct Donation { uint32 donationId; 4 bytes uint128 amount; 16 bytes address donor; 20 bytes }"
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
+					"system-creating": {
+						"id": "system-creating",
+						"title": "Donation Management",
+						"category": "",
+						"url": " /system/creating/",
+						"content": "Creating Donations The createDonation function mints an ERC-721 donation for 0 ETH for the zero address (0x0000…). The index of this token is the donation id. All donations made to this token will reference this donation id. struct Donation { uint32 donationId; 4 bytes uint128 amount; 16 bytes address donor; 20 bytes } Because the Donation struct stores the donation id as a 32-bit number the contracts impose a soft cap of 4,294,967,295 (2^32-1) donations. This allows for others to raise funds on behalf of the beneficiary and receive a recognition. Issuing Donations At deployment, the enableIssueDonation bool is set for the contract. If true, managers will have the ability to call the issueDonation function to create a symbolic donation. The symbolic donation can represent fiat, or other off-chain, donations. Symbolic donations may mint to a specific address. In the case of KYC’d fiat donations, the donor may provide an Ethereum address to attach to the symbolic donation. Symbolic donations are not minted and thus not tracked as ERC-721 assets. Deleting Donations At any time the owner may deleteDonation to zero-out the donation data in the smart contract."
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
+					"system-deployment": {
+						"id": "system-deployment",
+						"title": "Deployment",
+						"category": "",
+						"url": " /system/deployment/",
+						"content": "The contract deployer is set as contract owner and the first manager. The owner may add or remove managers or create a donation. The contract creates a “Genesis Donation” at index 0. It is an invalid donation and will revert transactions that reference it. _createDonation(\"Genesis Donation\", 0, this, \"\"); Prelaunch Variables The optional name and symbol for the ER721 standard reside in pure functions in DonationCore. function name() external pure returns (string _name) { _name = \"Heritage\"; } function symbol() external pure returns (string _symbol) { _symbol = \"A^3\"; } Gas Costs The size of the contract sits around 22kb. We’re trying for less than five USD to deploy."
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
+					"system-donating": {
+						"id": "system-donating",
+						"title": "Donating",
+						"category": "",
+						"url": " /system/donating/",
+						"content": "Making Donations Donors interacting with Heritage will call a makeDonation function and provide the donation id as a parameter. Heritage will mint an ERC-721 donation for the amount of ETH sent by the sender’s address. The donor’s token will reference the donation id of the original donation token. Donation Chaining If a donation is sent to a donor token, or token that was not created by a manager, the donation is treated as if sent to the original donation token. However, the child token is recorded as having raised some ETH for the original donation token. This allows for others to raise funds on behalf of the beneficiary and receive a recognition. Proxy Donations To facilitate donations without requiring MetaMask we can launch a proxy contract for a donation. In the proxy contract payable fallback we call a function similar to makeDonation that credits the original sender address. Anyone may launch a proxy for any donation that does not already have a proxy. Proxy Donation Cons Exchange addresses credit exchange, not user (Exchange holds keys) Additional deployment gas cost (Small) Additional gas cost to create a donation"
+					}
+
+					
+				
+			
+		
+			
+				
+					,
+					
+
+					"system-users": {
+						"id": "system-users",
+						"title": "Users",
+						"category": "",
+						"url": " /system/users/",
+						"content": ""
+					}
+
+					
+				
+			
+		
+	};
+</script>
+<script src="/scripts/lunr.min.js"></script>
+<script src="/scripts/search.js"></script>
+
+			</article>
+		</section>
+
+		<script>
+			document.getElementById("open-nav").addEventListener("click", function () {
+				document.body.classList.toggle("nav-open");
+			});
+		</script>
+	</body>
+</html>

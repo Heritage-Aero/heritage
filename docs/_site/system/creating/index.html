@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<!-- Begin Jekyll SEO tag v2.4.0 -->
+<title>Donation Management | Heritage</title>
+<meta name="generator" content="Jekyll v3.7.2" />
+<meta property="og:title" content="Donation Management" />
+<meta name="author" content="Alex Sherbuck" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Creating Donations The createDonation function mints an ERC-721 donation for 0 ETH for the zero address (0x0000…). The index of this token is the donation id. All donations made to this token will reference this donation id. struct Donation { uint32 donationId; // 4 bytes uint128 amount; // 16 bytes address donor; // 20 bytes } Because the Donation struct stores the donation id as a 32-bit number the contracts impose a soft cap of 4,294,967,295 (2^32-1) donations." />
+<meta property="og:description" content="Creating Donations The createDonation function mints an ERC-721 donation for 0 ETH for the zero address (0x0000…). The index of this token is the donation id. All donations made to this token will reference this donation id. struct Donation { uint32 donationId; // 4 bytes uint128 amount; // 16 bytes address donor; // 20 bytes } Because the Donation struct stores the donation id as a 32-bit number the contracts impose a soft cap of 4,294,967,295 (2^32-1) donations." />
+<link rel="canonical" href="http://localhost:4000/system/creating/" />
+<meta property="og:url" content="http://localhost:4000/system/creating/" />
+<meta property="og:site_name" content="Heritage" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-08-06T07:16:35+00:00" />
+<script type="application/ld+json">
+{"description":"Creating Donations The createDonation function mints an ERC-721 donation for 0 ETH for the zero address (0x0000…). The index of this token is the donation id. All donations made to this token will reference this donation id. struct Donation { uint32 donationId; // 4 bytes uint128 amount; // 16 bytes address donor; // 20 bytes } Because the Donation struct stores the donation id as a 32-bit number the contracts impose a soft cap of 4,294,967,295 (2^32-1) donations.","author":{"@type":"Person","name":"Alex Sherbuck"},"@type":"Article","url":"http://localhost:4000/system/creating/","publisher":{"@type":"Organization","logo":{"@type":"ImageObject","url":"http://localhost:4000/siteicon.png"},"name":"Alex Sherbuck"},"headline":"Donation Management","dateModified":"2018-08-06T07:16:35+00:00","datePublished":"2018-08-06T07:16:35+00:00","@context":"http://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+
+		<link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="Heritage" />
+
+		<link rel="stylesheet" href="//fonts.googleapis.com/css?family=Merriweather:400,400italic,700,700italic|Open+Sans:400,400italic,600,600italic,700,700italic|Inconsolata:400,700">
+		<link rel="stylesheet" href="/css/main.css">
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+		<link rel="icon" type="image/png" href="/touch-icon.png" sizes="192x192">
+		<link rel="icon" type="image/png" href="/images/favicon.png">
+
+		
+	</head>
+
+	<body>
+		<header>
+			<h1>
+				<a href="/"><img src="/images/logo.png" alt="Heritage logo"></a>
+
+				<button type="button" class="open-nav" id="open-nav"></button>
+			</h1>
+
+
+			<nav class="full-navigation">
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/">Getting Started</a>
+					</li>
+				</ul>
+
+				<ul>
+					
+					
+						<li class="nav-item top-level ">
+							
+							<a href="/architecture/architecture/">Architecture</a>
+							<ul>
+								
+									<li class="nav-item "><a href="/architecture/architecture/">Overview</a></li>
+								
+							</ul>
+						</li>
+					
+						<li class="nav-item top-level current">
+							
+							<a href="/system/users/">Heritage</a>
+							<ul>
+								
+									<li class="nav-item "><a href="/system/users/">Users</a></li>
+								
+									<li class="nav-item "><a href="/system/deployment/">Deployment</a></li>
+								
+									<li class="nav-item current"><a href="/system/creating/">Donation Management</a></li>
+								
+									<li class="nav-item "><a href="/system/donating/">Donating</a></li>
+								
+							</ul>
+						</li>
+					
+				</ul>
+
+				<ul>
+					<li class="nav-item top-level ">
+						
+						<a href="/changelog/"></a>
+					</li>
+				</ul>
+			</nav>
+		</header>
+
+		<section class="main">
+			<div class="page-header">
+				<h2>Heritage</h2>
+				<h3>Donation Management</h3>
+			</div>
+			<article class="content">
+				<h2 id="creating-donations">Creating Donations</h2>
+<p>The <code class="highlighter-rouge">createDonation</code> function mints an ERC-721 donation for 0 ETH for the zero address (0x0000…). The index of this token is the donation id. All donations made to this token will reference this donation id.</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  struct Donation {
+    uint32 donationId;  // 4 bytes
+    uint128 amount;     // 16 bytes
+    address donor;      // 20 bytes
+  }
+</code></pre></div></div>
+<p>Because the Donation struct stores the donation id as a 32-bit number the contracts impose a soft cap of 4,294,967,295 (2^32-1) donations.</p>
+
+<p>This allows for others to raise funds on behalf of the beneficiary and receive a recognition.</p>
+
+<h2 id="issuing-donations">Issuing Donations</h2>
+<p>At deployment, the <code class="highlighter-rouge">enableIssueDonation</code> bool is set for the contract. If true, managers will have the ability to call the <code class="highlighter-rouge">issueDonation</code> function to create a symbolic donation. The symbolic donation can represent fiat, or other off-chain, donations.</p>
+
+<p>Symbolic donations may mint to a specific address. In the case of KYC’d fiat donations, the donor may provide an Ethereum address to attach to the symbolic donation. Symbolic donations are not minted and thus not tracked as ERC-721 assets.</p>
+
+<h2 id="deleting-donations">Deleting Donations</h2>
+<p>At any time the owner may <code class="highlighter-rouge">deleteDonation</code> to zero-out the donation data in the smart contract.</p>
+
+
+			</article>
+		</section>
+
+		<script>
+			document.getElementById("open-nav").addEventListener("click", function () {
+				document.body.classList.toggle("nav-open");
+			});
+		</script>
+	</body>
+</html>

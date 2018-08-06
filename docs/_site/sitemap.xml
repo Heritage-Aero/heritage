@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<url>
+<loc>http://localhost:4000/architecture/architecture/</loc>
+<lastmod>2018-08-06T07:16:35+00:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/system/creating/</loc>
+<lastmod>2018-08-06T07:16:35+00:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/system/deployment/</loc>
+<lastmod>2018-08-06T07:16:35+00:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/system/donating/</loc>
+<lastmod>2018-08-06T07:16:35+00:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/system/users/</loc>
+<lastmod>2018-08-06T07:16:35+00:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2016/01/12/media-support/</loc>
+<lastmod>2016-01-12T00:00:00+00:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/2016/02/05/general-fixes-and-improvements/</loc>
+<lastmod>2016-02-05T00:00:00+00:00</lastmod>
+</url>
+<url>
+<loc>http://localhost:4000/</loc>
+</url>
+</urlset>
