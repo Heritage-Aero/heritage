@@ -24,6 +24,21 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     _createDonation("Genesis Donation", 0, this, "");
   }
 
+  function createDAIDonation(
+    string _description,
+    uint128 _goal,
+    address _beneficiary,
+    string _taxId
+  )
+    public
+    onlyManagers
+    whenNotPaused
+    returns (uint256)
+  {
+    require(donations.length < 4294967296 - 1); // 2^32-1
+    return _createDAIDonation(_description, _goal, _beneficiary, _taxId);
+  }
+
   function createDonation(
     string _description,
     uint128 _goal,
@@ -57,6 +72,8 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     require(donations.length < 4294967296 - 1);
     // Lookup the original donation
     uint32 donationId = donations[_donationId].donationId;
+    // Is not a token donation
+    require(!isDai[donationId]);
 
     // Cannot donate to deleted token/null address
     require(donationBeneficiary[donationId] != address(0));
@@ -79,6 +96,46 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     totalRaised += amount;
 
     return _makeDonation(donationId, amount, msg.sender);
+  }
+
+  // Make a DAI donation based on Id.
+  // Donate directly or proxy through another donation.
+  function makeDAIDonation(uint32 _donationId, uint128 _amount)
+    public
+    payable
+    whenNotPaused
+    returns (uint256)
+  {
+    // Cannot donate to Genesis
+    require(_donationId > 0);
+    // Must donate to an existing donation
+    require(_donationId < donations.length);
+    // 2^32-1
+    require(donations.length < 4294967296 - 1);
+    // Lookup the original donation
+    uint32 donationId = donations[_donationId].donationId;
+    // Must be a DAI donation token
+    require(isDai[donationId]);
+    // Cannot donate to deleted token/null address
+    require(donationBeneficiary[donationId] != address(0));
+    // A goal of 0 is uncapped
+    if (donationGoal[donationId] > 0) {
+      // It must not have reached it's goal
+      require(donationRaised[donationId] < donationGoal[donationId]);
+    }
+
+    // Donate through another person's donation
+    if (donationId != _donationId) {
+      donationRaised[_donationId] += _amount;
+    }
+    // Send the tx value to the charity
+    _transferDai(msg.sender, donationBeneficiary[donationId], _amount);
+    // Update the amount raised for the donation
+    donationRaised[donationId] += _amount;
+    // Update the total amount the contract has raised
+    totalDAIRaised += _amount;
+
+    return _makeDonation(donationId, _amount, msg.sender);
   }
 
   // Managers may issue donations directly. A way to accept fiat donations

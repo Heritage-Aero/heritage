@@ -1,6 +1,7 @@
 pragma solidity 0.4.24;
 
 import "zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol";
+import "./DaiDonation.sol";
 
 
 // Todo
@@ -22,7 +23,7 @@ contract Proxy {
 }
 
 
-contract DonationCore is ERC721BasicToken {
+contract DonationCore is ERC721BasicToken, DaiDonation {
   // Soft cap of 4,294,967,295 (2^32-1)
   // E.g. Fill every block for ~50 years
   Donation[] public donations;
@@ -119,6 +120,19 @@ contract DonationCore is ERC721BasicToken {
     Proxy p = new Proxy(_donationId);
     isProxy[p] = true;
     return p;
+  }
+
+  function _createDAIDonation(
+    string _description,
+    uint128 _goal,
+    address _beneficiary,
+    string _taxId
+  ) internal
+    returns (uint256)
+  {
+    uint newDonationId = _createDonation(_description, _goal, _beneficiary, _taxId);
+    _trackDaiDonation(newDonationId);
+    return newDonationId;
   }
 
   function _createDonation(
