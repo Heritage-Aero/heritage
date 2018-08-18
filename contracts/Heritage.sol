@@ -3,12 +3,11 @@ pragma solidity 0.4.24;
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
-import "zeppelin-solidity/contracts/ownership/NoOwner.sol";
 import "./Managed.sol";
 import "./DonationCore.sol";
 
 
-contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, DonationCore {
+contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   bool public issueDonationEnabled = false;
 
   modifier issueDonationIsEnabled() {
@@ -22,6 +21,16 @@ contract Heritage is Ownable, NoOwner, Pausable, Destructible, Managed, Donation
     issueDonationEnabled = enableIssueDonation;
 
     _createDonation("Genesis Donation", 0, this, "");
+  }
+
+  // Do not accept any transactions that send Ether.
+  function() external {
+  }
+
+  // Cannot prevent Ether from being mined/self-destructed to this contract
+  // reclaim lost Ether.
+  function reclaimEther() external onlyOwner {
+    owner.transfer(address(this).balance);
   }
 
   function createDonation(
