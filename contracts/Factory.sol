@@ -7,7 +7,7 @@ contract Factory {
   address[] public contracts;
   event CreateContract(address indexed contractAddress);
 
-  function createContract(bool enableIssueDonation) {
+  function createContract(bool enableIssueDonation) public {
     Heritage newContract = new Heritage(enableIssueDonation);
     newContract.transferOwnership(msg.sender);
     contracts.push(newContract);

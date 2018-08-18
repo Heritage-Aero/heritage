@@ -10,4 +10,3 @@ The Heritage smart contracts facilitate the creation, donation, and issuance of 
 $ npm install
 $ bash scripts/test.sh
 ```
-

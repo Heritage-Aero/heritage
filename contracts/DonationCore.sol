@@ -16,7 +16,7 @@ contract Proxy {
     donationCore = DonationCore(msg.sender);
   }
 
-  function() payable {
+  function() public payable {
     donationCore.proxyDonation.value(msg.value)(donationId, msg.sender);
   }
 }
@@ -144,7 +144,7 @@ contract DonationCore is ERC721BasicToken {
     donationGoal[newDonationId] = _goal;
     donationTaxId[newDonationId] = _taxId;
 
-    CreateDonation(_description, _goal, _beneficiary, _taxId, msg.sender);
+    emit CreateDonation(_description, _goal, _beneficiary, _taxId, msg.sender);
     return newDonationId;
   }
 
@@ -162,7 +162,7 @@ contract DonationCore is ERC721BasicToken {
     _mint(_donor, newDonationId);
     totalDonations++;
 
-    MakeDonation(newDonationId, _amount, _donor, msg.sender);
+    emit MakeDonation(newDonationId, _amount, _donor, msg.sender);
     return newDonationId;
   }
 
@@ -179,7 +179,7 @@ contract DonationCore is ERC721BasicToken {
     uint32 newDonationId = uint32(donations.push(_donation) - 1);
     totalIssued++;
 
-    IssueDonation(_donationId, _amount, _donor, msg.sender);
+    emit IssueDonation(_donationId, _amount, _donor, msg.sender);
     return newDonationId;
   }
 
@@ -193,6 +193,6 @@ contract DonationCore is ERC721BasicToken {
     donationGoal[_donationId] = 0;
     donationRaised[_donationId] = 0;
 
-    DeleteDonation(_donationId);
+    emit DeleteDonation(_donationId);
   }
 }
