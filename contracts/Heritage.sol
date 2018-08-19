@@ -50,7 +50,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
 
   // Make a donation based on Id.
   // Donate directly or proxy through another donation.
-  function makeDonation(uint32 _donationId)
+  function makeDonation(uint256 _donationId)
     public
     payable
     whenNotPaused
@@ -58,12 +58,14 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   {
     // Must make a donation
     require(msg.value > 0);
-    // Cannot donate to Genesis
+
+    uint256 totalDonations = donations.length;
+    // Cannot delete Genesis
     require(_donationId > 0);
-    // Must donate to an existing donation
-    require(_donationId < donations.length);
+    // Must delete an existing donation
+    require(_donationId < totalDonations);
     // 2^32-1
-    require(donations.length < 4294967296 - 1);
+    require(totalDonations < 4294967296 - 1);
     // Lookup the original donation
     uint32 donationId = donations[_donationId].donationId;
 
@@ -93,34 +95,37 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   // Managers may issue donations directly. A way to accept fiat donations
   // and credit an address. Optional -- disable/enable at deployment.
   // Does not effect contract totals. Must issue to a created donation.
-  function issueDonation(uint32 _donationId, uint128 _amount, address _donor)
+  function issueDonation(uint256 _donationId, uint256 _amount, address _donor)
     public
     onlyManagers
     issueDonationIsEnabled
     whenNotPaused
     returns (uint256)
   {
-    // Cannot donate to Genesis
+    uint256 totalDonations = donations.length;
+    // Cannot delete Genesis
     require(_donationId > 0);
-    // Must donate to an existing donation
-    require(_donationId < donations.length);
+    // Must delete an existing donation
+    require(_donationId < totalDonations);
     // 2^32-1
-    require(donations.length < 4294967296 - 1);
+    require(totalDonations < 4294967296 - 1);
     // Lookup the original donation
     uint32 donationId = donations[_donationId].donationId;
 
     return _issueDonation(donationId, _amount, _donor);
   }
 
-  function deleteDonation(uint32 _donationId)
+  function deleteDonation(uint256 _donationId)
     public
     onlyOwner
   {
+    uint256 totalDonations = donations.length;
     // Cannot delete Genesis
     require(_donationId > 0);
     // Must delete an existing donation
-    require(_donationId < donations.length);
-
+    require(_donationId < totalDonations);
+    // 2^32-1
+    require(totalDonations < 4294967296 - 1);
     _deleteDonation(_donationId);
   }
 }
