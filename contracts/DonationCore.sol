@@ -17,7 +17,7 @@ contract Proxy {
     donationCore = DonationCore(msg.sender);
   }
 
-  function() payable {
+  function() public payable {
     donationCore.proxyDonation.value(msg.value)(donationId, msg.sender);
   }
 }
@@ -28,22 +28,22 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   // E.g. Fill every block for ~50 years
   Donation[] public donations;
 
-  uint128 public totalRaised;
-  uint128 public totalDonations;
-  uint128 public totalIssued;
+  uint256 public totalRaised;
+  uint256 public totalDonations;
+  uint256 public totalIssued;
 
-  mapping (uint32 => string) public donationDescription;
-  mapping (uint32 => string) public donationTaxId;
-  mapping (uint32 => address) public donationBeneficiary;
-  mapping (uint32 => uint128) public donationGoal;
-  mapping (uint32 => uint128) public donationRaised;
+  mapping (uint256 => string) public donationDescription;
+  mapping (uint256 => string) public donationTaxId;
+  mapping (uint256 => address) public donationBeneficiary;
+  mapping (uint256 => uint128) public donationGoal;
+  mapping (uint256 => uint128) public donationRaised;
 
   mapping (address => bool) public isProxy;
 
-  event CreateDonation(string description, uint128 goal, address beneficiary, string taxId, address creator);
-  event MakeDonation(uint32 donationId, uint128 amount, address donor, address sender);
-  event IssueDonation(uint32 donationId, uint128 amount, address donor, address issuer);
-  event DeleteDonation(uint32 donationId);
+  event CreateDonation(string description, uint256 goal, address beneficiary, string taxId, address creator);
+  event MakeDonation(uint256 donationId, uint256 amount, address donor, address sender);
+  event IssueDonation(uint256 donationId, uint256 amount, address donor, address issuer);
+  event DeleteDonation(uint256 donationId);
 
   modifier onlyProxy() {
     require(isProxy[msg.sender]);
@@ -64,30 +64,29 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     _symbol = "A^3";
   }
 
-  function getDonation(uint32 _id) external view
+  function getDonation(uint256 _id) external view
     returns (
-      uint32 _originalDonationId,
-      uint32 _donationId,
+      uint256 _originalDonationId,
+      uint256 _donationId,
       string _description,
-      uint128 _goal,
-      uint128 _raised,
-      uint128 _amount,
+      uint256 _goal,
+      uint256 _raised,
+      uint256 _amount,
       address _beneficiary,
       address _donor,
       string _taxId
       ) {
+        Donation memory _donation = donations[_id];
 
-        uint32 donationId = donations[_id].donationId;
-
-        _originalDonationId = donationId;
+        _originalDonationId = _donation.donationId;
         _donationId = _id;
-        _description = donationDescription[donationId];
-        _goal = donationGoal[donationId];
-        _raised = donationRaised[donationId];
+        _description = donationDescription[_donation.donationId];
+        _goal = donationGoal[_donation.donationId];
+        _raised = donationRaised[_donation.donationId];
         _amount = donations[_id].amount;
-        _beneficiary = donationBeneficiary[donationId];
+        _beneficiary = donationBeneficiary[_donation.donationId];
         _donor = donations[_id].donor;
-        _taxId = donationTaxId[donationId];
+        _taxId = donationTaxId[_donation.donationId];
   }
 
   function totalDonationsCreated() external view returns (uint256 _totalDonations) {
@@ -103,7 +102,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   }
 
   function proxyDonation(
-    uint32 _donationId,
+    uint256 _donationId,
     address _donor
   )
     public
@@ -150,7 +149,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
       donor: address(0)
     });
 
-    uint32 newDonationId = uint32(donations.push(_donation) - 1);
+    uint256 newDonationId = donations.push(_donation) - 1;
     _mint(msg.sender, newDonationId);
 
     donationDescription[newDonationId] = _description;
@@ -158,46 +157,46 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     donationGoal[newDonationId] = _goal;
     donationTaxId[newDonationId] = _taxId;
 
-    CreateDonation(_description, _goal, _beneficiary, _taxId, msg.sender);
+    emit CreateDonation(_description, _goal, _beneficiary, _taxId, msg.sender);
     return newDonationId;
   }
 
-  function _makeDonation(uint32 _donationId, uint128 _amount, address _donor)
+  function _makeDonation(uint256 _donationId, uint256 _amount, address _donor)
     internal
     returns (uint256)
   {
     Donation memory _donation = Donation({
-      donationId: _donationId,
-      amount: _amount,
+      donationId: uint32(_donationId),
+      amount: uint128(_amount),
       donor: _donor
     });
 
-    uint32 newDonationId = uint32(donations.push(_donation) - 1);
+    uint256 newDonationId = donations.push(_donation) - 1;
     _mint(_donor, newDonationId);
     totalDonations++;
 
-    MakeDonation(newDonationId, _amount, _donor, msg.sender);
+    emit MakeDonation(newDonationId, _amount, _donor, msg.sender);
     return newDonationId;
   }
 
-  function _issueDonation(uint32 _donationId, uint128 _amount, address _donor)
+  function _issueDonation(uint256 _donationId, uint256 _amount, address _donor)
     internal
     returns (uint256)
   {
     Donation memory _donation = Donation({
-      donationId: _donationId,
-      amount: _amount,
+      donationId: uint32(_donationId),
+      amount: uint128(_amount),
       donor: _donor
     });
 
-    uint32 newDonationId = uint32(donations.push(_donation) - 1);
+    uint256 newDonationId = donations.push(_donation) - 1;
     totalIssued++;
 
-    IssueDonation(_donationId, _amount, _donor, msg.sender);
+    emit IssueDonation(_donationId, _amount, _donor, msg.sender);
     return newDonationId;
   }
 
-  function _deleteDonation(uint32 _donationId)
+  function _deleteDonation(uint256 _donationId)
     internal
   {
     delete donations[_donationId];
@@ -207,6 +206,6 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     donationGoal[_donationId] = 0;
     donationRaised[_donationId] = 0;
 
-    DeleteDonation(_donationId);
+    emit DeleteDonation(_donationId);
   }
 }

@@ -1,4 +1,4 @@
-# Heritage <img align="right" src="https://raw.githubusercontent.com/Heritage-Aero/heritage/master/imgs/HeritageHighRes.png?token=AF_omp8Iw_SltBLTziFUOgrL_Ah8a4vGks5bb8yKwA%3D%3D" height="80px" />
+# Heritage <img align="right" src="https://raw.githubusercontent.com/Heritage-Aero/heritage/master/imgs/HeritageHighRes.png" height="80px" />
 
 :warning: This code has not been reviewed.
 
@@ -10,4 +10,3 @@ The Heritage smart contracts facilitate the creation, donation, and issuance of 
 $ npm install
 $ bash scripts/test.sh
 ```
-
