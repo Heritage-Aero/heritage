@@ -30,16 +30,6 @@ contract('Heritage', accounts => {
   describe('Tests', () => {
 
     describe('Notary', async () => {
-      it('Has a name.', async () => {
-        const name = await heritage.name();
-
-        name.should.be.equal("Heritage");
-      });
-      it('Has a symbol.', async () => {
-        const name = await heritage.symbol();
-
-        name.should.be.equal("A^3");
-      });
       it('Has a contract owner.', async () => {
         const owner = await heritage.owner();
 
@@ -66,43 +56,6 @@ contract('Heritage', accounts => {
         genesisDonation[7].should.be.equal(zeroAddress);
         genesisDonation[8].should.be.equal("");
       });
-      it('Has totalDonationsCreated', async () => {
-        let created = await heritage.totalDonationsCreated();
-        created.should.be.bignumber.equal(1);
-        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-
-        created = await heritage.totalDonationsCreated();
-        created.should.be.bignumber.equal(2);
-
-        await heritage.makeDonation(1, { value: 10e18, from: creator });
-        await heritage.makeDonation(1, { value: 10e18, from: creator });
-        await heritage.makeDonation(1, { value: 10e18, from: creator });
-
-        created = await heritage.totalDonationsCreated();
-        created.should.be.bignumber.equal(2);
-      })
-      it('Has totalDonationsMade', async () => {
-        let created = await heritage.totalDonationsMade();
-        created.should.be.bignumber.equal(0);
-
-        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-        await heritage.makeDonation(1, { value: 10e18, from: creator });
-        await heritage.makeDonation(1, { value: 10e18, from: creator });
-        await heritage.makeDonation(1, { value: 10e18, from: creator });
-
-        created = await heritage.totalDonationsMade();
-        created.should.be.bignumber.equal(3);
-      })
-      it('Has totalDonationsIssued', async () => {
-        let created = await heritage.totalDonationsIssued();
-        created.should.be.bignumber.equal(0);
-
-        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId);
-        await heritage.issueDonation(1, 1000, zeroAddress);
-
-        created = await heritage.totalDonationsIssued();
-        created.should.be.bignumber.equal(1);
-      })
       it('Creates a Donation.', async () => {
         const { logs } = await heritage.createDonation("10 Laptops", 10*10e18, charity, taxId);
         const donation = await heritage.getDonation(1);

@@ -6,12 +6,36 @@ import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
 import "./Managed.sol";
 import "./DonationCore.sol";
 
+// Todo
+// Destroy Proxy once goal is met
+contract Proxy {
+  Heritage heritage;
+  uint256 donationId;
+
+  constructor(uint256 _donationId) public payable {
+    require(msg.value == 0);
+
+    donationId = _donationId;
+    heritage = Heritage(msg.sender);
+  }
+
+  function() public payable {
+    heritage.proxyDonation.value(msg.value)(donationId, msg.sender);
+  }
+}
+
 
 contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   bool public issueDonationEnabled = false;
+  mapping (address => bool) public isProxy;
 
   modifier issueDonationIsEnabled() {
     require(issueDonationEnabled);
+    _;
+  }
+
+  modifier onlyProxy() {
+    require(isProxy[msg.sender]);
     _;
   }
 
@@ -35,7 +59,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
 
   function createDonation(
     string _description,
-    uint128 _goal,
+    uint256 _goal,
     address _beneficiary,
     string _taxId
   )
@@ -50,7 +74,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
 
   function createDAIDonation(
     string _description,
-    uint128 _goal,
+    uint256 _goal,
     address _beneficiary,
     string _taxId
   )
@@ -61,6 +85,28 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   {
     require(donations.length < 4294967296 - 1); // 2^32-1
     return _createDAIDonation(_description, _goal, _beneficiary, _taxId);
+  }
+
+  function proxyDonation(
+    uint256 _donationId,
+    address _donor
+  )
+    public
+    payable
+    onlyProxy
+  {
+    _makeDonation(_donationId, msg.value, _donor);
+  }
+
+  function createDonationProxy(uint32 _donationId)
+    public
+    returns (address proxyAddress)
+  {
+    require(_donationId > 0);
+    require(_donationId < totalDonations);
+    Proxy p = new Proxy(_donationId);
+    isProxy[p] = true;
+    return p;
   }
 
   // Make a donation based on Id.
@@ -94,24 +140,23 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
       require(donationRaised[donationId] < donationGoal[donationId]);
     }
 
-    uint128 amount = uint128(msg.value);
     // Donate through another person's donation
     if (donationId != _donationId) {
-      donationRaised[_donationId] += amount;
+      donationRaised[_donationId] += msg.value;
     }
     // Send the tx value to the charity
-    donationBeneficiary[donationId].transfer(amount);
+    donationBeneficiary[donationId].transfer(msg.value);
     // Update the amount raised for the donation
-    donationRaised[donationId] += amount;
+    donationRaised[donationId] += msg.value;
     // Update the total amount the contract has raised
-    totalRaised += amount;
+    totalRaised += msg.value;
 
-    return _makeDonation(donationId, amount, msg.sender);
+    return _makeDonation(donationId, msg.value, msg.sender);
   }
 
   // Make a DAI donation based on Id.
   // Donate directly or proxy through another donation.
-  function makeDAIDonation(uint32 _donationId, uint128 _amount)
+  function makeDAIDonation(uint32 _donationId, uint256 _amount)
     public
     payable
     whenNotPaused

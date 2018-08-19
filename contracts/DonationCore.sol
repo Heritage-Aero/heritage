@@ -4,25 +4,6 @@ import "zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol";
 import "./DaiDonation.sol";
 
 
-// Todo
-// Destroy Proxy once goal is met
-contract Proxy {
-  DonationCore donationCore;
-  uint32 donationId;
-
-  constructor(uint32 _donationId) public payable {
-    require(msg.value == 0);
-
-    donationId = _donationId;
-    donationCore = DonationCore(msg.sender);
-  }
-
-  function() public payable {
-    donationCore.proxyDonation.value(msg.value)(donationId, msg.sender);
-  }
-}
-
-
 contract DonationCore is ERC721BasicToken, DaiDonation {
   // Soft cap of 4,294,967,295 (2^32-1)
   // E.g. Fill every block for ~50 years
@@ -35,33 +16,18 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   mapping (uint256 => string) public donationDescription;
   mapping (uint256 => string) public donationTaxId;
   mapping (uint256 => address) public donationBeneficiary;
-  mapping (uint256 => uint128) public donationGoal;
-  mapping (uint256 => uint128) public donationRaised;
-
-  mapping (address => bool) public isProxy;
+  mapping (uint256 => uint256) public donationGoal;
+  mapping (uint256 => uint256) public donationRaised;
 
   event CreateDonation(string description, uint256 goal, address beneficiary, string taxId, address creator);
   event MakeDonation(uint256 donationId, uint256 amount, address donor, address sender);
   event IssueDonation(uint256 donationId, uint256 amount, address donor, address issuer);
   event DeleteDonation(uint256 donationId);
 
-  modifier onlyProxy() {
-    require(isProxy[msg.sender]);
-    _;
-  }
-
   struct Donation {
     uint32 donationId;  // 4 bytes
     uint128 amount;     // 16 bytes
     address donor;      // 20 bytes
-  }
-
-  function name() external pure returns (string _name) {
-    _name = "Heritage";
-  }
-
-  function symbol() external pure returns (string _symbol) {
-    _symbol = "A^3";
   }
 
   function getDonation(uint256 _id) external view
@@ -89,41 +55,9 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
         _taxId = donationTaxId[_donation.donationId];
   }
 
-  function totalDonationsCreated() external view returns (uint256 _totalDonations) {
-    _totalDonations = donations.length - totalDonations;
-  }
-
-  function totalDonationsMade() external view returns (uint256 _totalDonations) {
-    _totalDonations = totalDonations;
-  }
-
-  function totalDonationsIssued() external view returns (uint256 _totalDonations) {
-    _totalDonations = totalIssued;
-  }
-
-  function proxyDonation(
-    uint256 _donationId,
-    address _donor
-  )
-    public
-    payable
-    onlyProxy
-  {
-    _makeDonation(_donationId, uint128(msg.value), _donor);
-  }
-
-  function createDonationProxy(uint32 _donationId)
-    public
-    returns (address proxyAddress)
-  {
-    Proxy p = new Proxy(_donationId);
-    isProxy[p] = true;
-    return p;
-  }
-
   function _createDAIDonation(
     string _description,
-    uint128 _goal,
+    uint256 _goal,
     address _beneficiary,
     string _taxId
   ) internal
@@ -136,7 +70,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
 
   function _createDonation(
     string _description,
-    uint128 _goal,
+    uint256 _goal,
     address _beneficiary,
     string _taxId
   )
