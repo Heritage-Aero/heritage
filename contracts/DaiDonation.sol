@@ -7,8 +7,7 @@ contract Token {
   function transferFrom(address _from, address _to, uint256 _value) public returns (bool);
 }
 
-
-// TODO pattern off this to accept/define other tokens
+// TODO Abstract to ERC-20, manage multple addresses/tokens, default to DAI
 contract DaiDonation is Ownable {
   Token public dai;
   mapping(uint256 => bool) public isDai;

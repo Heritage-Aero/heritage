@@ -9,9 +9,9 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   // E.g. Fill every block for ~50 years
   Donation[] public donations;
 
-  uint256 public totalRaised;
-  uint256 public totalDonations;
-  uint256 public totalIssued;
+  uint256 public totalDonationsCreated;
+  uint256 public totalDonationsMade;
+  uint256 public totalDonationsIssued;
 
   mapping (uint256 => string) public donationDescription;
   mapping (uint256 => string) public donationTaxId;
@@ -91,11 +91,13 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     donationGoal[newDonationId] = _goal;
     donationTaxId[newDonationId] = _taxId;
 
+    totalDonationsCreated++;
+
     emit CreateDonation(_description, _goal, _beneficiary, _taxId, msg.sender);
     return newDonationId;
   }
 
-  function _makeDonation(uint256 _donationId, uint256 _amount, address _donor)
+  function _makeDonation(uint256 _donationId, uint256 _amount, address _donor, bool mintToken)
     internal
     returns (uint256)
   {
@@ -106,27 +108,16 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     });
 
     uint256 newDonationId = donations.push(_donation) - 1;
-    _mint(_donor, newDonationId);
-    totalDonations++;
 
-    emit MakeDonation(newDonationId, _amount, _donor, msg.sender);
-    return newDonationId;
-  }
+    if (mintToken) {
+      _mint(_donor, newDonationId);
+      totalDonationsMade++;
+      emit MakeDonation(newDonationId, _amount, _donor, msg.sender);
+    } else {
+      totalDonationsIssued++;
+      emit IssueDonation(_donationId, _amount, _donor, msg.sender);
+    }
 
-  function _issueDonation(uint256 _donationId, uint256 _amount, address _donor)
-    internal
-    returns (uint256)
-  {
-    Donation memory _donation = Donation({
-      donationId: uint32(_donationId),
-      amount: uint128(_amount),
-      donor: _donor
-    });
-
-    uint256 newDonationId = donations.push(_donation) - 1;
-    totalIssued++;
-
-    emit IssueDonation(_donationId, _amount, _donor, msg.sender);
     return newDonationId;
   }
 

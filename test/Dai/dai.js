@@ -12,7 +12,7 @@ require('chai')
 
 const expect = require('chai').expect
 
-contract('Heritage', accounts => {
+contract('DAI Transactions', accounts => {
   const [creator, donor1, donor2, donor3, charity1] = accounts;
   let heritage = null;
   let erc20 =null;
@@ -53,9 +53,6 @@ contract('Heritage', accounts => {
       await erc20.approve(heritage.address, 10);
       await heritage.makeDAIDonation(1, 10);
     })
-    it('Fails to donate Eth to the DAI donation', async () => {
-      await assertRevert(heritage.makeDonation(1, { value: 10e18 }));
-    });
   })
 })
 

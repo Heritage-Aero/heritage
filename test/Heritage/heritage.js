@@ -106,7 +106,7 @@ contract('Heritage', accounts => {
         donation[8].should.be.equal(taxId);
 
         (await heritage.ownerOf(2)).should.be.equal(creator);
-        (await heritage.totalRaised()).should.be.bignumber.equal(10e18);
+        (await heritage.donationRaised(2)).should.be.bignumber.equal(0);
         (await heritage.donationRaised(1)).should.be.bignumber.equal(10e18);
 
         logs[1].event.should.be.equal('MakeDonation');
@@ -134,7 +134,7 @@ contract('Heritage', accounts => {
         donation[1].should.be.bignumber.equal(3);
         donation[2].should.be.equal("10 Laptops");
         donation[3].should.be.bignumber.equal(10 * 10e18);
-        donation[4].should.be.bignumber.equal(2 * 10e18);
+        donation[4].should.be.bignumber.equal(10e18);
         donation[5].should.be.bignumber.equal(10e18);
         donation[6].should.be.equal(charity);
         donation[7].should.be.equal(donor1);
@@ -143,13 +143,8 @@ contract('Heritage', accounts => {
         (await heritage.ownerOf(3)).should.be.equal(donor1);
 
         (await heritage.ownerOf(2)).should.be.equal(creator);
-        (await heritage.totalRaised()).should.be.bignumber.equal(2*10e18);
-
-        const donation1Raised = (await heritage.donationRaised(1)).toNumber();
-        const donation2Raised = (await heritage.donationRaised(2)).toNumber();
-
-        donation1Raised.should.be.equal(2*10e18);
-        donation2Raised.should.be.equal(10e18);
+        (await heritage.donationRaised(1)).should.be.bignumber.equal(10e18);
+        (await heritage.donationRaised(2)).should.be.bignumber.equal(10e18);
       });
       it('Creates uncapped donation', async() => {
         await heritage.createDonation("10 Laptops", 0, charity, taxId);
@@ -163,7 +158,45 @@ contract('Heritage', accounts => {
         donation1Raised.should.be.equal(2 * 10e18);
         donation1Goal.should.be.equal(0);
       })
+      context('Constants', async () => {
+        beforeEach(async () => {
+          heritage = await Heritage.new(true);
+          await heritage.createDonation("10 Laptops", 0, charity, taxId);
+          await heritage.makeDonation(1, { value: 10e18, from: donor1 });
+          await heritage.issueDonation(1, 1000, zeroAddress);
+        })
+        it('Has 2 created', async () => {
+          const created = await heritage.totalDonationsCreated();
 
+          created.should.be.bignumber.equal(2); // Genesis
+        })
+        it('Has 1 made', async () => {
+          const made = await heritage.totalDonationsMade();
+
+          made.should.be.bignumber.equal(1);
+        })
+        it('Has 1 issued', async () => {
+          const issued = await heritage.totalDonationsIssued();
+
+          issued.should.be.bignumber.equal(1);
+        })
+        it('Increments created, made and issued', async () => {
+          await heritage.createDonation("10 Laptops", 0, charity, taxId);
+          await heritage.makeDonation(1, { value: 10e18, from: donor1 });
+          await heritage.issueDonation(1, 1000, zeroAddress);
+          await heritage.createDonation("10 Laptops", 0, charity, taxId);
+          await heritage.makeDonation(1, { value: 10e18, from: donor1 });
+          await heritage.issueDonation(1, 1000, zeroAddress);
+
+          const created = await heritage.totalDonationsCreated();
+          const made = await heritage.totalDonationsMade();
+          const issued = await heritage.totalDonationsIssued();
+
+          created.should.be.bignumber.equal(4); // Genesis
+          made.should.be.bignumber.equal(3);
+          issued.should.be.bignumber.equal(3);
+        })
+      })
       context('User Fail Cases', async () => {
         beforeEach(async () => {
           heritage = await Heritage.new(true)

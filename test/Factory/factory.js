@@ -12,7 +12,7 @@ require('chai')
 
 const expect = require('chai').expect
 
-contract('Heritage', accounts => {
+contract('Factory Tests', accounts => {
   const [creator, donor1, donor2, donor3, donor4] = accounts
   let factory = null
 

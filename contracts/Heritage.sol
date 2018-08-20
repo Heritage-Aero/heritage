@@ -6,6 +6,7 @@ import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
 import "./Managed.sol";
 import "./DonationCore.sol";
 
+
 // Todo
 // Destroy Proxy once goal is met
 contract Proxy {
@@ -28,9 +29,21 @@ contract Proxy {
 contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   bool public issueDonationEnabled = false;
   mapping (address => bool) public isProxy;
+  mapping (uint256 => bool) public isFiat;
 
   modifier issueDonationIsEnabled() {
     require(issueDonationEnabled);
+    _;
+  }
+
+  modifier donationIdIsValid(uint256 _donationId) {
+    uint256 totalDonations = donations.length;
+    // Cannot delete Genesis
+    require(_donationId > 0);
+    // Must delete an existing donation
+    require(_donationId < totalDonations);
+    // 2^32-1
+    require(totalDonations < 4294967296 - 1);
     _;
   }
 
@@ -95,15 +108,15 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     payable
     onlyProxy
   {
-    _makeDonation(_donationId, msg.value, _donor);
+    _makeDonation(_donationId, msg.value, _donor, true);
   }
 
-  function createDonationProxy(uint32 _donationId)
+  function createDonationProxy(uint256 _donationId)
     public
+    donationIdIsValid(_donationId)
     returns (address proxyAddress)
   {
-    require(_donationId > 0);
-    require(_donationId < totalDonations);
+    require(!isFiat[_donationId]);
     Proxy p = new Proxy(_donationId);
     isProxy[p] = true;
     return p;
@@ -115,23 +128,14 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     public
     payable
     whenNotPaused
+    donationIdIsValid(_donationId)
     returns (uint256)
   {
-    // Must make a donation
     require(msg.value > 0);
-
-    uint256 totalDonations = donations.length;
-    // Cannot delete Genesis
-    require(_donationId > 0);
-    // Must delete an existing donation
-    require(_donationId < totalDonations);
-    // 2^32-1
-    require(totalDonations < 4294967296 - 1);
     // Lookup the original donation
-    uint32 donationId = donations[_donationId].donationId;
+    uint256 donationId = donations[_donationId].donationId;
     // Is not a token donation
     require(!isDai[donationId]);
-
     // Cannot donate to deleted token/null address
     require(donationBeneficiary[donationId] != address(0));
     // A goal of 0 is uncapped
@@ -140,36 +144,23 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
       require(donationRaised[donationId] < donationGoal[donationId]);
     }
 
-    // Donate through another person's donation
-    if (donationId != _donationId) {
-      donationRaised[_donationId] += msg.value;
-    }
     // Send the tx value to the charity
     donationBeneficiary[donationId].transfer(msg.value);
-    // Update the amount raised for the donation
-    donationRaised[donationId] += msg.value;
-    // Update the total amount the contract has raised
-    totalRaised += msg.value;
-
-    return _makeDonation(donationId, msg.value, msg.sender);
+    donationRaised[_donationId] += msg.value;
+    return _makeDonation(donationId, msg.value, msg.sender, true);
   }
 
   // Make a DAI donation based on Id.
   // Donate directly or proxy through another donation.
-  function makeDAIDonation(uint32 _donationId, uint256 _amount)
+  function makeDAIDonation(uint256 _donationId, uint256 _amount)
     public
-    payable
     whenNotPaused
+    donationIdIsValid(_donationId)
     returns (uint256)
   {
-    // Cannot donate to Genesis
-    require(_donationId > 0);
-    // Must donate to an existing donation
-    require(_donationId < donations.length);
-    // 2^32-1
-    require(donations.length < 4294967296 - 1);
+    require(_amount > 0);
     // Lookup the original donation
-    uint32 donationId = donations[_donationId].donationId;
+    uint256 donationId = donations[_donationId].donationId;
     // Must be a DAI donation token
     require(isDai[donationId]);
     // Cannot donate to deleted token/null address
@@ -180,18 +171,10 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
       require(donationRaised[donationId] < donationGoal[donationId]);
     }
 
-    // Donate through another person's donation
-    if (donationId != _donationId) {
-      donationRaised[_donationId] += _amount;
-    }
     // Send the tx value to the charity
     _transferDai(msg.sender, donationBeneficiary[donationId], _amount);
-    // Update the amount raised for the donation
-    donationRaised[donationId] += _amount;
-    // Update the total amount the contract has raised
-    totalDAIRaised += _amount;
-
-    return _makeDonation(donationId, _amount, msg.sender);
+    donationRaised[_donationId] += _amount;
+    return _makeDonation(donationId, _amount, msg.sender, true);
   }
 
   // Managers may issue donations directly. A way to accept fiat donations
@@ -202,32 +185,22 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     onlyManagers
     issueDonationIsEnabled
     whenNotPaused
+    donationIdIsValid(_donationId)
     returns (uint256)
   {
-    uint256 totalDonations = donations.length;
-    // Cannot delete Genesis
-    require(_donationId > 0);
-    // Must delete an existing donation
-    require(_donationId < totalDonations);
-    // 2^32-1
-    require(totalDonations < 4294967296 - 1);
     // Lookup the original donation
-    uint32 donationId = donations[_donationId].donationId;
+    uint256 donationId = donations[_donationId].donationId;
 
-    return _issueDonation(donationId, _amount, _donor);
+    uint256 id = _makeDonation(donationId, _amount, _donor, false);
+    isFiat[id];
+    return id;
   }
 
   function deleteDonation(uint256 _donationId)
     public
     onlyOwner
+    donationIdIsValid(_donationId)
   {
-    uint256 totalDonations = donations.length;
-    // Cannot delete Genesis
-    require(_donationId > 0);
-    // Must delete an existing donation
-    require(_donationId < totalDonations);
-    // 2^32-1
-    require(totalDonations < 4294967296 - 1);
     _deleteDonation(_donationId);
   }
 }
