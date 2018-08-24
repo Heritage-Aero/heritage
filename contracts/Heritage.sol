@@ -47,6 +47,11 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     _;
   }
 
+  modifier onlyTokenOwner(uint256 _donationId) {
+    require(msg.sender == ownerOf(_donationId));
+    _;
+  }
+
   modifier onlyProxy() {
     require(isProxy[msg.sender]);
     _;
@@ -57,7 +62,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
 
     issueDonationEnabled = enableIssueDonation;
 
-    _createDonation("Genesis Donation", 0, this, "");
+    _createDonation("Genesis Donation", 0, this, "", false);
   }
 
   // Do not accept any transactions that send Ether.
@@ -74,7 +79,8 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     string _description,
     uint256 _goal,
     address _beneficiary,
-    string _taxId
+    string _taxId,
+    bool _claimable
   )
     public
     onlyManagers
@@ -82,14 +88,15 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     returns (uint256)
   {
     require(donations.length < 4294967296 - 1); // 2^32-1
-    return _createDonation(_description, _goal, _beneficiary, _taxId);
+    return _createDonation(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
   function createDAIDonation(
     string _description,
     uint256 _goal,
     address _beneficiary,
-    string _taxId
+    string _taxId,
+    bool _claimable
   )
     public
     onlyManagers
@@ -97,7 +104,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     returns (uint256)
   {
     require(donations.length < 4294967296 - 1); // 2^32-1
-    return _createDAIDonation(_description, _goal, _beneficiary, _taxId);
+    return _createDAIDonation(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
   function proxyDonation(
@@ -194,6 +201,13 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     uint256 id = _makeDonation(donationId, _amount, _donor, false);
     isFiat[id];
     return id;
+  }
+
+  function claimDonation(uint256 _donationId)
+    public
+    onlyTokenOwner(_donationId)
+  {
+    _claimDonation(msg.sender, _donationId);
   }
 
   function deleteDonation(uint256 _donationId)
