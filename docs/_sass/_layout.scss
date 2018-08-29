@@ -1,3 +1,25 @@
+body {
+	background-color: #000;
+	text-align: center;
+	img {
+		max-width: 225px;
+
+	}
+}
+
+@media only screen and (max-width: 600px) {
+	img {
+		margin-top: 250px;
+	}
+}
+
+@media only screen and (min-width: 601px) {
+	img {
+		margin-top: 350px;
+	}
+}
+
+/*
 input::-ms-clear,
 input::-ms-reveal {
 	display: none !important;
@@ -462,3 +484,4 @@ img {
 .cms-editor-active .editor-link {
 	display: block;
 }
+*/
