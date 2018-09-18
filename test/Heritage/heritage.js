@@ -57,7 +57,7 @@ contract('Heritage', accounts => {
         genesisDonation[8].should.be.equal("");
       });
       it('Creates a Donation.', async () => {
-        const { logs } = await heritage.createDonation("10 Laptops", 10*10e18, charity, taxId, false);
+        const { logs } = await heritage.createFundraiser("10 Laptops", 10*10e18, charity, taxId, false);
         const donation = await heritage.getDonation(1);
 
         donation[0].should.be.bignumber.equal(1);
@@ -70,10 +70,10 @@ contract('Heritage', accounts => {
         donation[7].should.be.equal(zeroAddress);
         donation[8].should.be.equal(taxId);
 
-        logs[1].event.should.be.equal('CreateDonation');
+        logs[1].event.should.be.equal('CreateFundraiser');
       });
       it('Issues a Donation', async() => {
-        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId, false);
+        await heritage.createFundraiser("10 Laptops", 10 * 10e18, charity, taxId, false);
         const { logs } = await heritage.issueDonation(1, 1000, zeroAddress);
 
         const donation = await heritage.getDonation(2);
@@ -91,7 +91,7 @@ contract('Heritage', accounts => {
         logs[0].event.should.be.equal('IssueDonation');
       })
       it('Makes a donation', async () => {
-        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId, false);
+        await heritage.createFundraiser("10 Laptops", 10 * 10e18, charity, taxId, false);
         const { logs } = await heritage.makeDonation(1, {value: 10e18, from: creator});
         const donation = await heritage.getDonation(2);
 
@@ -112,7 +112,7 @@ contract('Heritage', accounts => {
         logs[1].event.should.be.equal('MakeDonation');
       });
       it('Deletes a donation', async() => {
-        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId, false);
+        await heritage.createFundraiser("10 Laptops", 10 * 10e18, charity, taxId, false);
         const { logs } = await heritage.deleteDonation(1);
 
         const d = await heritage.donations(1);
@@ -124,7 +124,7 @@ contract('Heritage', accounts => {
         logs[1].event.should.be.equal('DeleteDonation');
       })
       it('Makes a donation through a previous donation', async () => {
-        await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId, false);
+        await heritage.createFundraiser("10 Laptops", 10 * 10e18, charity, taxId, false);
         await heritage.makeDonation(1, { value: 10e18, from: creator });
         await heritage.makeDonation(2, { value: 10e18, from: donor1 });
 
@@ -147,7 +147,7 @@ contract('Heritage', accounts => {
         (await heritage.donationRaised(2)).should.be.bignumber.equal(10e18);
       });
       it('Creates uncapped donation', async() => {
-        await heritage.createDonation("10 Laptops", 0, charity, taxId, false);
+        await heritage.createFundraiser("10 Laptops", 0, charity, taxId, false);
 
         await heritage.makeDonation(1, { value: 10e18, from: donor1 });
         await heritage.makeDonation(1, { value: 10e18, from: donor1 });
@@ -161,7 +161,7 @@ contract('Heritage', accounts => {
       context('Constants', async () => {
         beforeEach(async () => {
           heritage = await Heritage.new(true);
-          await heritage.createDonation("10 Laptops", 0, charity, taxId, false);
+          await heritage.createFundraiser("10 Laptops", 0, charity, taxId, false);
           await heritage.makeDonation(1, { value: 10e18, from: donor1 });
           await heritage.issueDonation(1, 1000, zeroAddress);
         })
@@ -181,10 +181,10 @@ contract('Heritage', accounts => {
           issued.should.be.bignumber.equal(1);
         })
         it('Increments created, made and issued', async () => {
-          await heritage.createDonation("10 Laptops", 0, charity, taxId, false);
+          await heritage.createFundraiser("10 Laptops", 0, charity, taxId, false);
           await heritage.makeDonation(1, { value: 10e18, from: donor1 });
           await heritage.issueDonation(1, 1000, zeroAddress);
-          await heritage.createDonation("10 Laptops", 0, charity, taxId, false);
+          await heritage.createFundraiser("10 Laptops", 0, charity, taxId, false);
           await heritage.makeDonation(1, { value: 10e18, from: donor1 });
           await heritage.issueDonation(1, 1000, zeroAddress);
 
@@ -200,7 +200,7 @@ contract('Heritage', accounts => {
       context('User Fail Cases', async () => {
         beforeEach(async () => {
           heritage = await Heritage.new(true)
-          await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId, false);
+          await heritage.createFundraiser("10 Laptops", 10 * 10e18, charity, taxId, false);
         })
         it('Fails if the donation amount is zero', async () => {
           await assertRevert(heritage.makeDonation(1, { value: 0, from: creator }));
@@ -212,12 +212,12 @@ contract('Heritage', accounts => {
           await assertRevert(heritage.makeDonation(10, { value: 10e18, from: creator }));
         })
         it('Fails if the donation has reached its goal', async () => {
-          await heritage.createDonation("10 Laptops", 10 * 10e18, charity, taxId, false);
+          await heritage.createFundraiser("10 Laptops", 10 * 10e18, charity, taxId, false);
           await heritage.makeDonation(1, { value: 10*10e18, from: creator });
           await assertRevert(heritage.makeDonation(1, { value: 10e18, from: creator }));
         })
         it("Fails to issue a donation if issueDonationEnabled is false", async() => {
-          heritageNoFiat.createDonation("10 Laptops", 10 * 10e18, charity, taxId, false);
+          heritageNoFiat.createFundraiser("10 Laptops", 10 * 10e18, charity, taxId, false);
 
           await assertRevert(heritageNoFiat.issueDonation(1, 1000, zeroAddress));
         })

@@ -23,7 +23,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   mapping (uint256 => bool) public donationClaimable;
 
   // Event logging
-  event CreateDonation(string description, uint256 goal, address beneficiary, string taxId, address creator, bool claimable);
+  event CreateFundraiser(string description, uint256 goal, address beneficiary, string taxId, address creator, bool claimable);
   event MakeDonation(uint256 donationId, uint256 amount, address donor, address sender);
   event ClaimDonation(address donor, uint256 donationId);
   event IssueDonation(uint256 donationId, uint256 amount, address donor, address issuer);
@@ -64,7 +64,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
         _claimable = donationClaimable[_id];
   }
 
-  function _createDAIDonation(
+  function _createDAIFundraiser(
     string _description,
     uint256 _goal,
     address _beneficiary,
@@ -73,12 +73,12 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   ) internal
     returns (uint256)
   {
-    uint256 newDonationId = _createDonation(_description, _goal, _beneficiary, _taxId, _claimable);
+    uint256 newDonationId = _createFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
     _trackDaiDonation(newDonationId);
     return newDonationId;
   }
 
-  function _createDonation(
+  function _createFundraiser(
     string _description,
     uint256 _goal,
     address _beneficiary,
@@ -105,7 +105,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
 
     totalDonationsCreated++;
 
-    emit CreateDonation(_description, _goal, _beneficiary, _taxId, msg.sender, _claimable);
+    emit CreateFundraiser(_description, _goal, _beneficiary, _taxId, msg.sender, _claimable);
     return newDonationId;
   }
 

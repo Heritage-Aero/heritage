@@ -64,7 +64,7 @@ contract Heritage is Destructible, Managed, DonationCore {
 
     issueDonationEnabled = enableIssueDonation;
 
-    _createDonation("Genesis Donation", 0, this, "", false);
+    _createFundraiser("Genesis Donation", 0, this, "", false);
   }
 
   // Do not accept any transactions that send Ether.
@@ -80,7 +80,7 @@ contract Heritage is Destructible, Managed, DonationCore {
     emit ReclaimEther(_balance);
   }
 
-  function createDonation(
+  function createFundraiser(
     string _description,
     uint256 _goal,
     address _beneficiary,
@@ -93,10 +93,10 @@ contract Heritage is Destructible, Managed, DonationCore {
     returns (uint256)
   {
     require(donations.length < MAX_DONATIONS);
-    return _createDonation(_description, _goal, _beneficiary, _taxId, _claimable);
+    return _createFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
-  function createDAIDonation(
+  function createDAIFundraiser(
     string _description,
     uint256 _goal,
     address _beneficiary,
@@ -109,7 +109,7 @@ contract Heritage is Destructible, Managed, DonationCore {
     returns (uint256)
   {
     require(donations.length < MAX_DONATIONS);
-    return _createDAIDonation(_description, _goal, _beneficiary, _taxId, _claimable);
+    return _createDAIFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
   function proxyDonation(
@@ -136,7 +136,7 @@ contract Heritage is Destructible, Managed, DonationCore {
     _makeDonation(_donationId, msg.value, _donor, true);
   }
 
-  function createDonationProxy(uint256 _donationId)
+  function createFundraiserProxy(uint256 _donationId)
     public
     donationIdIsValid(_donationId)
     whenNotPaused

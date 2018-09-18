@@ -25,7 +25,7 @@ contract('DAI Transactions', accounts => {
     erc20 = await StandardTokenMock.new(creator, tokenSupply);
     heritage = await Heritage.new(false);
 
-    await heritage.createDAIDonation("Donation Description", 1000, charity1, "14-123412", false);
+    await heritage.createDAIFundraiser("Donation Description", 1000, charity1, "14-123412", false);
   })
 
   describe('Tests', () => {

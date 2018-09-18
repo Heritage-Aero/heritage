@@ -27,7 +27,7 @@ contract('DAI Transactions', accounts => {
 
   context('Claimable ERC20', async () => {
     beforeEach(async () => {
-      await heritage.createDAIDonation("Claimable DAI Donation Description", 1000, charity1, "14-123412", true);
+      await heritage.createDAIFundraiser("Claimable DAI Donation Description", 1000, charity1, "14-123412", true);
       await heritage.changeDaiAddress(erc20.address);
     })
     it('Makes a DAI donation, then claims the token', async () => {
@@ -51,7 +51,7 @@ contract('DAI Transactions', accounts => {
 
   context('Claimable ETH', async () => {
     beforeEach(async () => {
-      await heritage.createDonation("Claimable Donation Description", 1000, charity1, "14-123412", true);
+      await heritage.createFundraiser("Claimable Donation Description", 1000, charity1, "14-123412", true);
     })
     it('Makes a donation, then claims the token', async () => {
       await heritage.makeDonation(1, {value: 100});
