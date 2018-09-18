@@ -31,7 +31,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
 
   // Donation struct
   struct Donation {
-    uint32 donationId;  // 4 bytes
+    uint128 donationId;  // 4 bytes
     uint128 amount;     // 16 bytes
     address donor;      // 20 bytes
   }
