@@ -1,7 +1,6 @@
 pragma solidity 0.4.24;
 
-import "zeppelin-solidity/contracts/ownership/Ownable.sol";
-import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
+
 import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
 import "./Managed.sol";
 import "./DonationCore.sol";
@@ -26,7 +25,7 @@ contract Proxy {
 }
 
 
-contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
+contract Heritage is Destructible, Managed, DonationCore {
   bool public issueDonationEnabled = false;
   mapping (address => bool) public isProxy;
   mapping (uint256 => bool) public isFiat;
@@ -38,9 +37,9 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
 
   modifier donationIdIsValid(uint256 _donationId) {
     uint256 totalDonations = donations.length;
-    // Cannot delete Genesis
+    // Cannot debelete Genesis
     require(_donationId > 0);
-    // Must delete an existing donation
+    // Must be an existing donation
     require(_donationId < totalDonations);
     // 2^32-1
     require(totalDonations < 4294967296 - 1);
@@ -114,6 +113,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
     public
     payable
     onlyProxy
+    whenNotPaused
   {
     _makeDonation(_donationId, msg.value, _donor, true);
   }
@@ -121,6 +121,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   function createDonationProxy(uint256 _donationId)
     public
     donationIdIsValid(_donationId)
+    whenNotPaused
     returns (address proxyAddress)
   {
     require(!isFiat[_donationId]);
@@ -205,6 +206,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
 
   function claimDonation(uint256 _donationId)
     public
+    whenNotPaused
     onlyTokenOwner(_donationId)
   {
     _claimDonation(msg.sender, _donationId);
@@ -213,6 +215,7 @@ contract Heritage is Ownable, Pausable, Destructible, Managed, DonationCore {
   function deleteDonation(uint256 _donationId)
     public
     onlyOwner
+    whenNotPaused
     donationIdIsValid(_donationId)
   {
     _deleteDonation(_donationId);

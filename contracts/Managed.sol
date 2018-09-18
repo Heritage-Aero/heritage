@@ -1,9 +1,10 @@
 pragma solidity 0.4.24;
 
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
+import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 
-contract Managed is Ownable {
+contract Managed is Ownable, Pausable {
 
   mapping(address => bool) public managers;
 
@@ -21,12 +22,12 @@ contract Managed is Ownable {
     managers[msg.sender] = true;
   }
 
-  function addManager(address _manager) public onlyOwner {
+  function addManager(address _manager) public whenNotPaused onlyOwner {
     managers[_manager] = true;
     emit AddManager(_manager);
   }
 
-  function removeManager(address _manager) public onlyOwner {
+  function removeManager(address _manager) public whenNotPaused onlyOwner {
     managers[_manager] = false;
     emit RemoveManager(_manager);
   }
