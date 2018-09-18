@@ -26,6 +26,7 @@ contract Proxy {
 
 
 contract Heritage is Destructible, Managed, DonationCore {
+  uint256 constant MAX_DONATIONS = 4294967295; //2^64 - 1
   bool public issueDonationEnabled = false;
   mapping (address => bool) public isProxy;
   mapping (uint256 => bool) public isFiat;
@@ -42,7 +43,7 @@ contract Heritage is Destructible, Managed, DonationCore {
     // Must be an existing donation
     require(_donationId < totalDonations);
     // 2^32-1
-    require(totalDonations < 4294967296 - 1);
+    require(totalDonations < MAX_DONATIONS);
     _;
   }
 
@@ -91,7 +92,7 @@ contract Heritage is Destructible, Managed, DonationCore {
     whenNotPaused
     returns (uint256)
   {
-    require(donations.length < 4294967296 - 1); // 2^32-1
+    require(donations.length < MAX_DONATIONS);
     return _createDonation(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
@@ -107,7 +108,7 @@ contract Heritage is Destructible, Managed, DonationCore {
     whenNotPaused
     returns (uint256)
   {
-    require(donations.length < 4294967296 - 1); // 2^32-1
+    require(donations.length < MAX_DONATIONS);
     return _createDAIDonation(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
