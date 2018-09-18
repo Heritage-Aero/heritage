@@ -121,6 +121,18 @@ contract Heritage is Destructible, Managed, DonationCore {
     onlyProxy
     whenNotPaused
   {
+    uint256 donationId = donations[_donationId].donationId;
+
+    // Is not a token/fiat donation
+    require(!isFiat[donationId]);
+    require(!isDai[donationId]);
+    // Cannot donate to deleted token/null address
+    require(donationBeneficiary[donationId] != address(0));
+    // A goal of 0 is uncapped
+    if (donationGoal[donationId] > 0) {
+      // It must not have reached it's goal
+      require(donationRaised[donationId] < donationGoal[donationId]);
+    }
     _makeDonation(_donationId, msg.value, _donor, true);
   }
 
@@ -165,7 +177,6 @@ contract Heritage is Destructible, Managed, DonationCore {
   }
 
   // Make a DAI donation based on Id.
-  // Donate directly or proxy through another donation.
   function makeDAIDonation(uint256 _donationId, uint256 _amount)
     public
     whenNotPaused
