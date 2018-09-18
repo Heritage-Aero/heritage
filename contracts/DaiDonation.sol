@@ -15,13 +15,16 @@ contract DaiDonation is Ownable, Pausable {
   mapping(uint256 => bool) public isDai;
   uint256 totalDAIRaised;
 
+  event ChangeDAIAddress(address newAddress);
+
   constructor() public payable {
     require(msg.value == 0);
-    dai = Token(0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359); // Mainnet Dai Address
+    changeDaiAddress(0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359); // Mainnet Dai Address
   }
 
   function changeDaiAddress(address _daiContract) public onlyOwner whenNotPaused {
     dai = Token(_daiContract);
+    emit ChangeDAIAddress(_daiContract);
   }
 
   function _trackDaiDonation(uint256 _id) internal {

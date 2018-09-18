@@ -25,6 +25,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   // Event logging
   event CreateDonation(string description, uint256 goal, address beneficiary, string taxId, address creator, bool claimable);
   event MakeDonation(uint256 donationId, uint256 amount, address donor, address sender);
+  event ClaimDonation(address donor, uint256 donationId);
   event IssueDonation(uint256 donationId, uint256 amount, address donor, address issuer);
   event DeleteDonation(uint256 donationId);
 
@@ -158,6 +159,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     donations[_donationId].donor = _donor;
 
     donationClaimable[_donationId] = false;
+    emit ClaimDonation(_donor, _donationId);
   }
 
   function _deleteDonation(uint256 _donationId)

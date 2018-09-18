@@ -56,6 +56,8 @@ contract Heritage is Destructible, Managed, DonationCore {
     _;
   }
 
+  event ReclaimEther(uint256 balance);
+
   constructor(bool enableIssueDonation) public payable {
     require(msg.value == 0);
 
@@ -71,7 +73,10 @@ contract Heritage is Destructible, Managed, DonationCore {
   // Cannot prevent Ether from being mined/self-destructed to this contract
   // reclaim lost Ether.
   function reclaimEther() external onlyOwner {
-    owner.transfer(address(this).balance);
+    uint256 _balance = address(this).balance;
+
+    owner.transfer(_balance);
+    emit ReclaimEther(_balance);
   }
 
   function createDonation(
