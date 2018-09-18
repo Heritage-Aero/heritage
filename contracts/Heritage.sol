@@ -26,7 +26,7 @@ contract Proxy {
 
 
 contract Heritage is Destructible, Managed, DonationCore {
-  uint256 constant MAX_DONATIONS = 340282366920938463463374607431768211455; //2^128 - 1
+  uint256 constant MAX_DONATIONS = 2**128 - 1;
   bool public issueDonationEnabled = false;
   mapping (address => bool) public isProxy;
   mapping (uint256 => bool) public isFiat;
