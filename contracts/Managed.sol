@@ -6,7 +6,7 @@ import "zeppelin-solidity/contracts/lifecycle/Pausable.sol";
 
 contract Managed is Ownable, Pausable {
 
-  mapping(address => bool) public managers;
+  mapping(address => bool) private managers;
 
   event AddManager(address manager);
   event RemoveManager(address manager);
