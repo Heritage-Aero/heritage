@@ -73,7 +73,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   ) internal
     returns (uint256)
   {
-    uint newDonationId = _createDonation(_description, _goal, _beneficiary, _taxId, _claimable);
+    uint256 newDonationId = _createDonation(_description, _goal, _beneficiary, _taxId, _claimable);
     _trackDaiDonation(newDonationId);
     return newDonationId;
   }

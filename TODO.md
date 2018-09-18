@@ -1,3 +1,4 @@
-Pre-activation campaign management
-Edit certificates
-Delete certificates
+more explicit event logging
+multiple tokens
+
+

@@ -1,6 +1,6 @@
 pragma solidity 0.4.24;
 
-import '../Managed.sol';
+import "../Managed.sol";
 
 contract ManagedMock is Managed {
   constructor() public { }
