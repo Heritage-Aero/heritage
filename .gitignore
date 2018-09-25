@@ -1,4 +1,5 @@
 build
+ENVVAR.env
 
 # Logs
 logs
