@@ -12,26 +12,26 @@ module.exports = {
     livenet: {
       host: 'localhost',
       port: 8545,
-      gas: 70000000,
+      gas: 8003929,
       network_id: '*' // Match any network id
     },
     development: {
       host: 'localhost',
       port: 18545,
-      gas: 100000000,
+      gas: 8003929,
       network_id: '*' // Match any network id
     },
     ropsten: {
       host: 'localhost',
       port: 18545,
       network_id: 3, // official id of the ropsten network
-      gas: 30000000
+      gas: 8003929
     },
     testnet: {
       host: '144.202.123.40',
       port: 9546,
       network_id: 313, // official id of the A^3 network
-      gas: 4700000
+      gas: 8003929
     }
   },
   rpc: {
