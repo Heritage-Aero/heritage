@@ -28,7 +28,7 @@ module.exports = {
         libraryTarget: 'umd',
         libraryExport: 'default',
         path: path.resolve(__dirname, 'dist'),
-        filename: 'index.js',
+        filename: 'heritage.js',
         publicPath: config.get('publicPath')
     },
     module: {
