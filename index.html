@@ -1,0 +1,55 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>HeritageJS</title>
+</head>
+
+<body>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', async function () {
+
+            var heritage = new HeritageJS();
+            await heritage.init();
+
+            async function getDonation(id) {
+                console.log(await heritage._getDonation(id));
+            }
+
+            await getDonation(0);
+
+            /*
+            heritage.init().then(function(test) {
+                heritage.totalCampaigns(function(err, total) {
+                    console.log('Total Campaigns: ' + total.toNumber())
+                })
+                heritage.getCampaign(1, function (err, campaign) {
+                    console.log(campaign)
+                });
+                heritage.getCertificate(1,0, function(err, cert) {
+                    console.log(cert)
+                })
+                heritage.getToken(1, function(err, token) {
+                    console.log(token)
+                })
+                $('.donate').on('click', function () {
+                    heritage.createToken(1,1, function(err, txid) {
+                        console.log(err)
+                        console.log(txid)
+                    })
+                })
+
+            })
+            */
+
+        });
+    </script>
+
+</body>
+
+</html>
