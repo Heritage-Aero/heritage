@@ -13,10 +13,10 @@ export class HeritageJS {
             // End the script
             return;
         }
+
         this.defaultConfig = {
             provider: this.web3.currentProvider,
-            contractAddress: '0x37e0a78a7f714f233829051d61d9403b1d8cfde3',
-            campaignId: 'campaignId',
+            contractAddress: abi.networks[4447].address,
             donationId: 'donationId',
             amount: 'donationAmount',
             btnClass: 'btn-heritage',
@@ -45,12 +45,11 @@ export class HeritageJS {
 
         const self = this;
         this.buttons.forEach(btn => {
-            const campaignId = btn.dataset[this.config.campaignId];
             const donationId = btn.dataset[this.config.donationId];
             const amount = btn.dataset[this.config.amount];
 
             btn.addEventListener('click', async () => {
-                await self._createToken(campaignId, donationId, amount*10e17);
+                await self._makeDonation(donationId, amount*10e17);
             })
         })
     }
@@ -287,6 +286,18 @@ export class HeritageJS {
 
     async _pause() {
         return await this.heritage.pause();
+    }
+
+    owner(cb) {
+        this._owner().then((owner) => {
+            return cb(null, owner);
+        }).catch((e) => {
+            return cb(e);
+        });
+    }
+
+    async _owner() {
+        return await this.heritage.owner();
     }
 
     unpause(cb) {
