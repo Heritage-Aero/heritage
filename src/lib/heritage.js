@@ -17,8 +17,8 @@ export class HeritageJS {
         this.defaultConfig = {
             provider: this.web3.currentProvider,
             contractAddress: abi.networks[4447].address,
-            donationId: 'donationId',
-            amount: 'donationAmount',
+            donationId: 'donationid',
+            amount: 'amount',
             btnClass: 'btn-heritage',
             className: 'heritage-dapp',
             wireHtml: true,
@@ -45,6 +45,7 @@ export class HeritageJS {
 
         const self = this;
         this.buttons.forEach(btn => {
+            console.log(btn.dataset[this.config.donationId])
             const donationId = btn.dataset[this.config.donationId];
             const amount = btn.dataset[this.config.amount];
 
@@ -129,6 +130,8 @@ export class HeritageJS {
     }
 
     async _makeDonation(donationId, amount) {
+        console.log(donationId)
+        console.log(amount)
         return await this.heritage.makeDonation(donationId, {
             from: this.web3.eth.accounts[0],
             value: amount
@@ -299,6 +302,36 @@ export class HeritageJS {
     async _owner() {
         return await this.heritage.owner();
     }
+
+
+
+    isManager(address, cb) {
+        this._isManager(address).then((isMan) => {
+            return cb(null, isMan);
+        }).catch((e) => {
+            return cb(e);
+        });
+    }
+
+    async _isManager(address) {
+        return await this.heritage.isManager(address);
+    }
+
+
+    addManager(address, cb) {
+        this._addManager(address).then((receipt) => {
+            return cb(null, receipt);
+        }).catch((e) => {
+            return cb(e);
+        });
+    }
+
+    async _addManager(address) {
+        return await this.heritage.addManager(address);
+    }
+
+
+
 
     unpause(cb) {
         this._unpause().then((token) => {

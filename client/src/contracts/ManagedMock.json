@@ -1,0 +1,653 @@
+{
+  "contractName": "ManagedMock",
+  "abi": [
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_manager",
+          "type": "address"
+        }
+      ],
+      "name": "addManager",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "unpause",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "pause",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_manager",
+          "type": "address"
+        }
+      ],
+      "name": "removeManager",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "_newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "_manager",
+          "type": "address"
+        }
+      ],
+      "name": "isManager",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "AddManager",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "name": "manager",
+          "type": "address"
+        }
+      ],
+      "name": "RemoveManager",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "Pause",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [],
+      "name": "Unpause",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipRenounced",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "constant": false,
+      "inputs": [],
+      "name": "managersOnly",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x60806040526000805460a060020a60ff021916905534801561002057600080fd5b5060008054600160a060020a03191633179055341561003e57600080fd5b336000908152600160208190526040909120805460ff191690911790556105768061006a6000396000f3006080604052600436106100a35763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416632d06177a81146100a85780633f4ba83a146100cb5780635c975abb146100e0578063715018a6146101095780638456cb591461011e5780638da5cb5b14610133578063ac18de4314610164578063f178ff4214610185578063f2fde38b1461019a578063f3ae2415146101bb575b600080fd5b3480156100b457600080fd5b506100c9600160a060020a03600435166101dc565b005b3480156100d757600080fd5b506100c9610266565b3480156100ec57600080fd5b506100f56102dc565b604080519115158252519081900360200190f35b34801561011557600080fd5b506100c96102ec565b34801561012a57600080fd5b506100c9610358565b34801561013f57600080fd5b506101486103d3565b60408051600160a060020a039092168252519081900360200190f35b34801561017057600080fd5b506100c9600160a060020a03600435166103e2565b34801561019157600080fd5b506100f5610468565b3480156101a657600080fd5b506100c9600160a060020a036004351661048c565b3480156101c757600080fd5b506100f5600160a060020a03600435166104af565b60005460a060020a900460ff16156101f357600080fd5b600054600160a060020a0316331461020a57600080fd5b600160a060020a038116600081815260016020818152604092839020805460ff1916909217909155815192835290517f3630096a7f9a158ab9fae41e86bfe31fd2202585a26a9668242672566dae028d9281900390910190a150565b600054600160a060020a0316331461027d57600080fd5b60005460a060020a900460ff16151561029557600080fd5b6000805474ff0000000000000000000000000000000000000000191681556040517f7805862f689e2f13df9f062ff482ad3ad112aca9e0847911ed832e158c525b339190a1565b60005460a060020a900460ff1681565b600054600160a060020a0316331461030357600080fd5b60008054604051600160a060020a03909116917ff8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c6482091a26000805473ffffffffffffffffffffffffffffffffffffffff19169055565b600054600160a060020a0316331461036f57600080fd5b60005460a060020a900460ff161561038657600080fd5b6000805474ff0000000000000000000000000000000000000000191660a060020a1781556040517f6985a02210a168e66602d3235cb6db0e70f92b3ba4d376a33c0f3d9434bff6259190a1565b600054600160a060020a031681565b60005460a060020a900460ff16156103f957600080fd5b600054600160a060020a0316331461041057600080fd5b600160a060020a038116600081815260016020908152604091829020805460ff19169055815192835290517f1e25ed4cabec84d314dc176241019653f237da01f2bdd3a10cb0f38b33da67639281900390910190a150565b3360009081526001602052604081205460ff16151561048657600080fd5b50600190565b600054600160a060020a031633146104a357600080fd5b6104ac816104cd565b50565b600160a060020a031660009081526001602052604090205460ff1690565b600160a060020a03811615156104e257600080fd5b60008054604051600160a060020a03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a36000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03929092169190911790555600a165627a7a723058207400aa447450b9e1e10e713cbbc6492eb7b26449845e004bded5e3847ef659ec0029",
+  "deployedBytecode": "0x6080604052600436106100a35763ffffffff7c01000000000000000000000000000000000000000000000000000000006000350416632d06177a81146100a85780633f4ba83a146100cb5780635c975abb146100e0578063715018a6146101095780638456cb591461011e5780638da5cb5b14610133578063ac18de4314610164578063f178ff4214610185578063f2fde38b1461019a578063f3ae2415146101bb575b600080fd5b3480156100b457600080fd5b506100c9600160a060020a03600435166101dc565b005b3480156100d757600080fd5b506100c9610266565b3480156100ec57600080fd5b506100f56102dc565b604080519115158252519081900360200190f35b34801561011557600080fd5b506100c96102ec565b34801561012a57600080fd5b506100c9610358565b34801561013f57600080fd5b506101486103d3565b60408051600160a060020a039092168252519081900360200190f35b34801561017057600080fd5b506100c9600160a060020a03600435166103e2565b34801561019157600080fd5b506100f5610468565b3480156101a657600080fd5b506100c9600160a060020a036004351661048c565b3480156101c757600080fd5b506100f5600160a060020a03600435166104af565b60005460a060020a900460ff16156101f357600080fd5b600054600160a060020a0316331461020a57600080fd5b600160a060020a038116600081815260016020818152604092839020805460ff1916909217909155815192835290517f3630096a7f9a158ab9fae41e86bfe31fd2202585a26a9668242672566dae028d9281900390910190a150565b600054600160a060020a0316331461027d57600080fd5b60005460a060020a900460ff16151561029557600080fd5b6000805474ff0000000000000000000000000000000000000000191681556040517f7805862f689e2f13df9f062ff482ad3ad112aca9e0847911ed832e158c525b339190a1565b60005460a060020a900460ff1681565b600054600160a060020a0316331461030357600080fd5b60008054604051600160a060020a03909116917ff8df31144d9c2f0f6b59d69b8b98abd5459d07f2742c4df920b25aae33c6482091a26000805473ffffffffffffffffffffffffffffffffffffffff19169055565b600054600160a060020a0316331461036f57600080fd5b60005460a060020a900460ff161561038657600080fd5b6000805474ff0000000000000000000000000000000000000000191660a060020a1781556040517f6985a02210a168e66602d3235cb6db0e70f92b3ba4d376a33c0f3d9434bff6259190a1565b600054600160a060020a031681565b60005460a060020a900460ff16156103f957600080fd5b600054600160a060020a0316331461041057600080fd5b600160a060020a038116600081815260016020908152604091829020805460ff19169055815192835290517f1e25ed4cabec84d314dc176241019653f237da01f2bdd3a10cb0f38b33da67639281900390910190a150565b3360009081526001602052604081205460ff16151561048657600080fd5b50600190565b600054600160a060020a031633146104a357600080fd5b6104ac816104cd565b50565b600160a060020a031660009081526001602052604090205460ff1690565b600160a060020a03811615156104e257600080fd5b60008054604051600160a060020a03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a36000805473ffffffffffffffffffffffffffffffffffffffff1916600160a060020a03929092169190911790555600a165627a7a723058207400aa447450b9e1e10e713cbbc6492eb7b26449845e004bded5e3847ef659ec0029",
+  "sourceMap": "51:167:7:-;;;268:5:12;247:26;;-1:-1:-1;;;;;;247:26:12;;;87:24:7;5:2:-1;;;;30:1;27;20:12;5:2;-1:-1;567:5:14;:18;;-1:-1:-1;;;;;;567:18:14;575:10;567:18;;;433:9:3;:14;425:23;;;;;;464:10;455:20;;;;478:4;455:20;;;;;;;;:27;;-1:-1:-1;;455:27:3;;;;;;51:167:7;;;;;;",
+  "deployedSourceMap": "51:167:7:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;491:136:3;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;491:136:3;-1:-1:-1;;;;;491:136:3;;;;;;;838:92:12;;8:9:-1;5:2;;;30:1;27;20:12;5:2;838:92:12;;;;247:26;;8:9:-1;5:2;;;30:1;27;20:12;5:2;247:26:12;;;;;;;;;;;;;;;;;;;;;;1001:111:14;;8:9:-1;5:2;;;30:1;27;20:12;5:2;1001:111:14;;;;666:90:12;;8:9:-1;5:2;;;30:1;27;20:12;5:2;666:90:12;;;;238:20:14;;8:9:-1;5:2;;;30:1;27;20:12;5:2;238:20:14;;;;;;;;-1:-1:-1;;;;;238:20:14;;;;;;;;;;;;;;631:143:3;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;631:143:3;-1:-1:-1;;;;;631:143:3;;;;;115:101:7;;8:9:-1;5:2;;;30:1;27;20:12;5:2;115:101:7;;;;1274:103:14;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;1274:103:14;-1:-1:-1;;;;;1274:103:14;;;;;778:100:3;;8:9:-1;5:2;;;30:1;27;20:12;5:2;-1:-1;778:100:3;-1:-1:-1;;;;;778:100:3;;;;;491:136;416:6:12;;-1:-1:-1;;;416:6:12;;;;415:7;407:16;;;;;;719:5:14;;-1:-1:-1;;;;;719:5:14;705:10;:19;697:28;;;;;;-1:-1:-1;;;;;566:18:3;;;;;;587:4;566:18;;;;;;;;;:25;;-1:-1:-1;;566:25:3;;;;;;;602:20;;;;;;;;;;;;;;;;;491:136;:::o;838:92:12:-;719:5:14;;-1:-1:-1;;;;;719:5:14;705:10;:19;697:28;;;;;;568:6:12;;-1:-1:-1;;;568:6:12;;;;560:15;;;;;;;;900:5;891:14;;-1:-1:-1;;891:14:12;;;916:9;;;;900:5;916:9;838:92::o;247:26::-;;;-1:-1:-1;;;247:26:12;;;;;:::o;1001:111:14:-;719:5;;-1:-1:-1;;;;;719:5:14;705:10;:19;697:28;;;;;;1077:5;;;1058:25;;-1:-1:-1;;;;;1077:5:14;;;;1058:25;;;1105:1;1089:18;;-1:-1:-1;;1089:18:14;;;1001:111::o;666:90:12:-;719:5:14;;-1:-1:-1;;;;;719:5:14;705:10;:19;697:28;;;;;;416:6:12;;-1:-1:-1;;;416:6:12;;;;415:7;407:16;;;;;;720:6;:13;;-1:-1:-1;;720:13:12;-1:-1:-1;;;720:13:12;;;744:7;;;;720:6;744:7;666:90::o;238:20:14:-;;;-1:-1:-1;;;;;238:20:14;;:::o;631:143:3:-;416:6:12;;-1:-1:-1;;;416:6:12;;;;415:7;407:16;;;;;;719:5:14;;-1:-1:-1;;;;;719:5:14;705:10;:19;697:28;;;;;;-1:-1:-1;;;;;709:18:3;;730:5;709:18;;;:8;:18;;;;;;;;;:26;;-1:-1:-1;;709:26:3;;;746:23;;;;;;;;;;;;;;;;;631:143;:::o;115:101:7:-;362:10:3;180:4:7;353:20:3;;;:8;:20;;;;;;;;345:29;;;;;;;;-1:-1:-1;205:4:7;115:101;:::o;1274:103:14:-;719:5;;-1:-1:-1;;;;;719:5:14;705:10;:19;697:28;;;;;;1343:29;1362:9;1343:18;:29::i;:::-;1274:103;:::o;778:100:3:-;-1:-1:-1;;;;;855:18:3;836:4;855:18;;;:8;:18;;;;;;;;;778:100::o;1512:171:14:-;-1:-1:-1;;;;;1582:23:14;;;;1574:32;;;;;;1638:5;;;1617:38;;-1:-1:-1;;;;;1617:38:14;;;;1638:5;;;1617:38;;;1661:5;:17;;-1:-1:-1;;1661:17:14;-1:-1:-1;;;;;1661:17:14;;;;;;;;;;1512:171::o",
+  "source": "pragma solidity 0.4.24;\n\nimport \"../Managed.sol\";\n\ncontract ManagedMock is Managed {\n  constructor() public { }\n\n  function managersOnly()\n    onlyManagers\n    public\n    returns (bool)\n    {\n      return true;\n    }\n}",
+  "sourcePath": "/home/hayek/proj/Notary/contracts/mocks/Managed-mock.sol",
+  "ast": {
+    "absolutePath": "/home/hayek/proj/Notary/contracts/mocks/Managed-mock.sol",
+    "exportedSymbols": {
+      "ManagedMock": [
+        1461
+      ]
+    },
+    "id": 1462,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1443,
+        "literals": [
+          "solidity",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:7"
+      },
+      {
+        "absolutePath": "/home/hayek/proj/Notary/contracts/Managed.sol",
+        "file": "../Managed.sol",
+        "id": 1444,
+        "nodeType": "ImportDirective",
+        "scope": 1462,
+        "sourceUnit": 1321,
+        "src": "25:24:7",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 1445,
+              "name": "Managed",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 1320,
+              "src": "75:7:7",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Managed_$1320",
+                "typeString": "contract Managed"
+              }
+            },
+            "id": 1446,
+            "nodeType": "InheritanceSpecifier",
+            "src": "75:7:7"
+          }
+        ],
+        "contractDependencies": [
+          1320,
+          1633,
+          1813
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 1461,
+        "linearizedBaseContracts": [
+          1461,
+          1320,
+          1633,
+          1813
+        ],
+        "name": "ManagedMock",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1449,
+              "nodeType": "Block",
+              "src": "108:3:7",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 1450,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1447,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "98:2:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1448,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "108:0:7"
+            },
+            "scope": 1461,
+            "src": "87:24:7",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1459,
+              "nodeType": "Block",
+              "src": "190:26:7",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "74727565",
+                    "id": 1457,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "205:4:7",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 1456,
+                  "id": 1458,
+                  "nodeType": "Return",
+                  "src": "198:11:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1460,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 1453,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 1452,
+                  "name": "onlyManagers",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 1249,
+                  "src": "143:12:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "143:12:7"
+              }
+            ],
+            "name": "managersOnly",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1451,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "136:2:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1456,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1455,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1460,
+                  "src": "180:4:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1454,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "180:4:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "179:6:7"
+            },
+            "scope": 1461,
+            "src": "115:101:7",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 1462,
+        "src": "51:167:7"
+      }
+    ],
+    "src": "0:218:7"
+  },
+  "legacyAST": {
+    "absolutePath": "/home/hayek/proj/Notary/contracts/mocks/Managed-mock.sol",
+    "exportedSymbols": {
+      "ManagedMock": [
+        1461
+      ]
+    },
+    "id": 1462,
+    "nodeType": "SourceUnit",
+    "nodes": [
+      {
+        "id": 1443,
+        "literals": [
+          "solidity",
+          "0.4",
+          ".24"
+        ],
+        "nodeType": "PragmaDirective",
+        "src": "0:23:7"
+      },
+      {
+        "absolutePath": "/home/hayek/proj/Notary/contracts/Managed.sol",
+        "file": "../Managed.sol",
+        "id": 1444,
+        "nodeType": "ImportDirective",
+        "scope": 1462,
+        "sourceUnit": 1321,
+        "src": "25:24:7",
+        "symbolAliases": [],
+        "unitAlias": ""
+      },
+      {
+        "baseContracts": [
+          {
+            "arguments": null,
+            "baseName": {
+              "contractScope": null,
+              "id": 1445,
+              "name": "Managed",
+              "nodeType": "UserDefinedTypeName",
+              "referencedDeclaration": 1320,
+              "src": "75:7:7",
+              "typeDescriptions": {
+                "typeIdentifier": "t_contract$_Managed_$1320",
+                "typeString": "contract Managed"
+              }
+            },
+            "id": 1446,
+            "nodeType": "InheritanceSpecifier",
+            "src": "75:7:7"
+          }
+        ],
+        "contractDependencies": [
+          1320,
+          1633,
+          1813
+        ],
+        "contractKind": "contract",
+        "documentation": null,
+        "fullyImplemented": true,
+        "id": 1461,
+        "linearizedBaseContracts": [
+          1461,
+          1320,
+          1633,
+          1813
+        ],
+        "name": "ManagedMock",
+        "nodeType": "ContractDefinition",
+        "nodes": [
+          {
+            "body": {
+              "id": 1449,
+              "nodeType": "Block",
+              "src": "108:3:7",
+              "statements": []
+            },
+            "documentation": null,
+            "id": 1450,
+            "implemented": true,
+            "isConstructor": true,
+            "isDeclaredConst": false,
+            "modifiers": [],
+            "name": "",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1447,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "98:2:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1448,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "108:0:7"
+            },
+            "scope": 1461,
+            "src": "87:24:7",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          },
+          {
+            "body": {
+              "id": 1459,
+              "nodeType": "Block",
+              "src": "190:26:7",
+              "statements": [
+                {
+                  "expression": {
+                    "argumentTypes": null,
+                    "hexValue": "74727565",
+                    "id": 1457,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": true,
+                    "kind": "bool",
+                    "lValueRequested": false,
+                    "nodeType": "Literal",
+                    "src": "205:4:7",
+                    "subdenomination": null,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    },
+                    "value": "true"
+                  },
+                  "functionReturnParameters": 1456,
+                  "id": 1458,
+                  "nodeType": "Return",
+                  "src": "198:11:7"
+                }
+              ]
+            },
+            "documentation": null,
+            "id": 1460,
+            "implemented": true,
+            "isConstructor": false,
+            "isDeclaredConst": false,
+            "modifiers": [
+              {
+                "arguments": null,
+                "id": 1453,
+                "modifierName": {
+                  "argumentTypes": null,
+                  "id": 1452,
+                  "name": "onlyManagers",
+                  "nodeType": "Identifier",
+                  "overloadedDeclarations": [],
+                  "referencedDeclaration": 1249,
+                  "src": "143:12:7",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_modifier$__$",
+                    "typeString": "modifier ()"
+                  }
+                },
+                "nodeType": "ModifierInvocation",
+                "src": "143:12:7"
+              }
+            ],
+            "name": "managersOnly",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 1451,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "136:2:7"
+            },
+            "payable": false,
+            "returnParameters": {
+              "id": 1456,
+              "nodeType": "ParameterList",
+              "parameters": [
+                {
+                  "constant": false,
+                  "id": 1455,
+                  "name": "",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 1460,
+                  "src": "180:4:7",
+                  "stateVariable": false,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_bool",
+                    "typeString": "bool"
+                  },
+                  "typeName": {
+                    "id": 1454,
+                    "name": "bool",
+                    "nodeType": "ElementaryTypeName",
+                    "src": "180:4:7",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_bool",
+                      "typeString": "bool"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "internal"
+                }
+              ],
+              "src": "179:6:7"
+            },
+            "scope": 1461,
+            "src": "115:101:7",
+            "stateMutability": "nonpayable",
+            "superFunction": null,
+            "visibility": "public"
+          }
+        ],
+        "scope": 1462,
+        "src": "51:167:7"
+      }
+    ],
+    "src": "0:218:7"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.24+commit.e67f0147.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "2.0.1",
+  "updatedAt": "2018-10-25T04:02:38.522Z"
+}
