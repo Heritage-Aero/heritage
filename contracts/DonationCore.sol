@@ -8,9 +8,11 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   // Soft cap of 4,294,967,295 (2^32-1)
   // E.g. Fill every block for ~50 years
   Donation[] public donations;
+  // Convenience array tracking fundraisers
+  uint256[] public fundraisers;
 
   // Tracking variables
-  uint256 public totalDonationsCreated;
+  uint256 public totalFundraisersCreated;
   uint256 public totalDonationsMade;
   uint256 public totalDonationsIssued;
 
@@ -49,19 +51,19 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
       address _donor,
       string _taxId,
       bool _claimable
-      ) {
-        uint256 origId = donations[_id].donationId;
+    ) {
+      uint256 origId = donations[_id].donationId;
 
-        _originalDonationId = origId;
-        _donationId = _id;
-        _description = donationDescription[origId];
-        _goal = donationGoal[origId];
-        _raised = donationRaised[origId];
-        _amount = donations[_id].amount;
-        _beneficiary = donationBeneficiary[origId];
-        _donor = donations[_id].donor;
-        _taxId = donationTaxId[origId];
-        _claimable = donationClaimable[_id];
+      _originalDonationId = origId;
+      _donationId = _id;
+      _description = donationDescription[origId];
+      _goal = donationGoal[origId];
+      _raised = donationRaised[origId];
+      _amount = donations[_id].amount;
+      _beneficiary = donationBeneficiary[origId];
+      _donor = donations[_id].donor;
+      _taxId = donationTaxId[origId];
+      _claimable = donationClaimable[_id];
   }
 
   function _createDAIFundraiser(
@@ -103,8 +105,9 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     donationTaxId[newDonationId] = _taxId;
     donationClaimable[newDonationId] = _claimable;
 
-    totalDonationsCreated++;
+    totalFundraisersCreated++;
 
+    fundraisers.push(newDonationId);
     emit CreateFundraiser(_description, _goal, _beneficiary, _taxId, msg.sender, _claimable);
     return newDonationId;
   }
