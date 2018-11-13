@@ -25,19 +25,13 @@ contract('DAI Transactions', accounts => {
     erc20 = await StandardTokenMock.new(creator, tokenSupply);
     heritage = await Heritage.new(false);
 
-    await heritage.createDAIFundraiser("Donation Description", 1000, charity1, "14-123412", false);
+    await heritage.createFundraiser("Donation Description", charity1, "14-123412");
   })
 
   describe('Tests', () => {
     it('Creator has an ERC20 balance', async () => {
       const balance = await erc20.balanceOf(creator);
       balance.should.be.bignumber.equal(tokenSupply);
-    });
-    it('Has an ERC20 donation', async () => {
-      const donation = await heritage.getDonation(1);
-      const isDai = await heritage.isDai(1);
-
-      isDai.should.be.equal(true);
     });
     it('Changes the ERC20 token address', async () => {
       let daiAddr = await heritage.dai();

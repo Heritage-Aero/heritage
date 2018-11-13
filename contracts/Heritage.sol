@@ -5,6 +5,7 @@ import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
 import "./Managed.sol";
 import "./DonationCore.sol";
 
+
 contract Heritage is Destructible, Managed, DonationCore {
   uint256 constant MAX_DONATIONS = 2**128 - 1;
   bool public issueDonationEnabled = false;
@@ -16,13 +17,13 @@ contract Heritage is Destructible, Managed, DonationCore {
     _;
   }
 
-  modifier donationIdIsValid(uint256 _donationId) {
+  modifier donationIdIsValid(uint256 _fundraiserId) {
     uint256 totalDonations = donations.length;
     // Cannot debelete Genesis
-    require(_donationId > 0);
+    require(_fundraiserId > 0);
     // Must be an existing donation
-    require(_donationId < totalDonations);
-    // 2^32-1
+    require(_fundraiserId <= totalFundraisers);
+    // 2^128-1
     require(totalDonations < MAX_DONATIONS);
     _;
   }
@@ -39,7 +40,9 @@ contract Heritage is Destructible, Managed, DonationCore {
 
     issueDonationEnabled = enableIssueDonation;
 
-    _createFundraiser("Genesis Donation", 0, this, "");
+    _createFundraiser("Genesis Fundraiser", address(0), "");
+    _makeDonation(0, 0, 0, false);
+
   }
 
   // Do not accept any transactions that send Ether.
@@ -57,7 +60,6 @@ contract Heritage is Destructible, Managed, DonationCore {
 
   function createFundraiser(
     string _description,
-    uint256 _goal,
     address _beneficiary,
     string _taxId
   )
@@ -67,80 +69,71 @@ contract Heritage is Destructible, Managed, DonationCore {
     returns (uint256)
   {
     require(donations.length < MAX_DONATIONS);
-    return _createFundraiser(_description, _goal, _beneficiary, _taxId);
+    return _createFundraiser(_description, _beneficiary, _taxId);
   }
 
   // Make a donation based on Id.
   // Donate directly.
-  function makeDonation(uint256 _donationId)
+  function makeDonation(uint256 _fundraiserId)
     public
     payable
     whenNotPaused
-    donationIdIsValid(_donationId)
+    donationIdIsValid(_fundraiserId)
     returns (uint256)
   {
     require(msg.value > 0);
-    // Lookup the original donation
-    uint256 donationId = donations[_donationId].donationId;
-    // Is not a token donation
-    require(!isDai[donationId]);
     // Cannot donate to deleted token/null address
-    require(donationBeneficiary[donationId] != address(0));
-    // A goal of 0 is uncapped
-    if (donationGoal[donationId] > 0) {
-      // It must not have reached it's goal
-      require(donationRaised[donationId] < donationGoal[donationId]);
-    }
+    require(fundraiserBeneficiary[_fundraiserId] != address(0));
 
     // Send the tx value to the charity
-    donationBeneficiary[donationId].transfer(msg.value);
-    donationRaised[_donationId] += msg.value;
-    return _makeDonation(donationId, msg.value, msg.sender, true);
+    fundraiserBeneficiary[_fundraiserId].transfer(msg.value);
+    fundraiserRaised[_fundraiserId] += msg.value;
+    return _makeDonation(_fundraiserId, msg.value, msg.sender, true);
   }
 
   // Make a DAI donation based on Id.
-  function makeDAIDonation(uint256 _donationId, uint256 _amount)
+  function makeDAIDonation(uint256 _fundraiserId, uint256 _amount)
     public
     whenNotPaused
-    donationIdIsValid(_donationId)
+    donationIdIsValid(_fundraiserId)
     returns (uint256)
   {
     require(_amount > 0);
-    // Lookup the original donation
-    uint256 donationId = donations[_donationId].donationId;
-    // Must be a DAI donation token
-    require(isDai[donationId]);
     // Cannot donate to deleted token/null address
-    require(donationBeneficiary[donationId] != address(0));
-    // A goal of 0 is uncapped
-    if (donationGoal[donationId] > 0) {
-      // It must not have reached it's goal
-      require(donationRaised[donationId] < donationGoal[donationId]);
-    }
+    require(fundraiserBeneficiary[_fundraiserId] != address(0));
 
     // Send the tx value to the charity
-    _transferDai(msg.sender, donationBeneficiary[donationId], _amount);
-    donationRaised[_donationId] += _amount;
-    return _makeDonation(donationId, _amount, msg.sender, true);
+    _transferDai(msg.sender, fundraiserBeneficiary[_fundraiserId], _amount);
+
+    fundraiserDAIRaised[_fundraiserId] += _amount;
+    totalDAIRaised += _amount;
+
+    return _makeDonation(_fundraiserId, _amount, msg.sender, true);
   }
 
   // Managers may issue donations directly. A way to accept fiat donations
   // and credit an address. Optional -- disable/enable at deployment.
   // Does not effect contract totals. Must issue to a created donation.
-  function issueDonation(uint256 _donationId, uint256 _amount, address _donor)
+  function issueDonation(uint256 _fundraiserId, uint256 _amount, address _donor)
     public
     onlyManagers
     issueDonationIsEnabled
     whenNotPaused
-    donationIdIsValid(_donationId)
+    donationIdIsValid(_fundraiserId)
     returns (uint256)
   {
-    // Lookup the original donation
-    uint256 donationId = donations[_donationId].donationId;
-
-    uint256 id = _makeDonation(donationId, _amount, _donor, false);
+    uint256 id = _makeDonation(_fundraiserId, _amount, _donor, false);
     isFiat[id];
     return id;
+  }
+
+  function deleteFundraiser(uint256 _fundraiserId)
+    public
+    onlyOwner
+    whenNotPaused
+    donationIdIsValid(_fundraiserId)
+  {
+    _deleteFundraiser(_fundraiserId);
   }
 
   function deleteDonation(uint256 _donationId)

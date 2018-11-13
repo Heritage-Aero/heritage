@@ -9,11 +9,11 @@ contract Token {
 }
 
 
-// TODO Abstract to ERC-20, manage multple addresses/tokens, default to DAI
 contract DaiDonation is Ownable, Pausable {
   Token public dai;
-  mapping(uint256 => bool) public isDai;
   uint256 totalDAIRaised;
+
+  mapping (uint256 => uint256) public fundraiserDAIRaised;
 
   event ChangeDAIAddress(address newAddress);
 
@@ -25,10 +25,6 @@ contract DaiDonation is Ownable, Pausable {
   function changeDaiAddress(address _daiContract) public onlyOwner whenNotPaused {
     dai = Token(_daiContract);
     emit ChangeDAIAddress(_daiContract);
-  }
-
-  function _trackDaiDonation(uint256 _id) internal {
-    isDai[_id] = true;
   }
 
   function _transferDai(address _from, address _to, uint256 _amount) internal {
