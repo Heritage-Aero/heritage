@@ -27,6 +27,12 @@ module.exports = {
       network_id: 3, // official id of the ropsten network
       gas: 8003929
     },
+    rinkeby: {
+      host: "localhost",
+      port: 8545,
+      from: "0x091491de20c58a592ca0d39172073809c0c1adc9",
+      network_id: 4
+    },
     testnet: {
       host: '144.202.123.40',
       port: 9546,

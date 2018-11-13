@@ -166,7 +166,7 @@ contract('Heritage', accounts => {
           await heritage.issueDonation(1, 1000, zeroAddress);
         })
         it('Has 2 created', async () => {
-          const created = await heritage.totalDonationsCreated();
+          const created = await heritage.totalFundraisersCreated();
 
           created.should.be.bignumber.equal(2); // Genesis
         })
@@ -188,7 +188,7 @@ contract('Heritage', accounts => {
           await heritage.makeDonation(1, { value: 10e17, from: donor1 });
           await heritage.issueDonation(1, 1000, zeroAddress);
 
-          const created = await heritage.totalDonationsCreated();
+          const created = await heritage.totalFundraisersCreated();
           const made = await heritage.totalDonationsMade();
           const issued = await heritage.totalDonationsIssued();
 
@@ -196,6 +196,17 @@ contract('Heritage', accounts => {
           made.should.be.bignumber.equal(3);
           issued.should.be.bignumber.equal(3);
         })
+      })
+      it('Tracks new fundraisers', async () => {
+        await heritage.createFundraiser("1 Laptops", 0, charity, taxId, false);
+        await heritage.createFundraiser("2 Laptops", 0, charity, taxId, false);
+        await heritage.createFundraiser("3 Laptops", 0, charity, taxId, false);
+        await heritage.createFundraiser("4 Laptops", 0, charity, taxId, false);
+
+        const totalFundraisers = await heritage.totalFundraisersCreated();
+        const fundraiserId = await heritage.fundraisers(totalFundraisers-1);
+        const f = await heritage.getDonation(fundraiserId);
+        f[2].should.be.equal("4 Laptops");
       })
       context('User Fail Cases', async () => {
         beforeEach(async () => {

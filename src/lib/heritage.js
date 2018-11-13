@@ -16,7 +16,7 @@ export class HeritageJS {
 
         this.defaultConfig = {
             provider: this.web3.currentProvider,
-            contractAddress: abi.networks[4447].address,
+            contractAddress: abi.networks[4].address,
             donationId: 'donationId',
             amount: 'donationAmount',
             btnClass: 'btn-heritage',
