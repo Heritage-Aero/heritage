@@ -5,30 +5,10 @@ import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
 import "./Managed.sol";
 import "./DonationCore.sol";
 
-
-// Todo
-// Destroy Proxy once goal is met
-contract Proxy {
-  Heritage heritage;
-  uint256 donationId;
-
-  constructor(uint256 _donationId) public payable {
-    require(msg.value == 0);
-
-    donationId = _donationId;
-    heritage = Heritage(msg.sender);
-  }
-
-  function() public payable {
-    heritage.proxyDonation.value(msg.value)(donationId, msg.sender);
-  }
-}
-
-
 contract Heritage is Destructible, Managed, DonationCore {
   uint256 constant MAX_DONATIONS = 2**128 - 1;
   bool public issueDonationEnabled = false;
-  mapping (address => bool) public isProxy;
+
   mapping (uint256 => bool) public isFiat;
 
   modifier issueDonationIsEnabled() {
@@ -52,11 +32,6 @@ contract Heritage is Destructible, Managed, DonationCore {
     _;
   }
 
-  modifier onlyProxy() {
-    require(isProxy[msg.sender]);
-    _;
-  }
-
   event ReclaimEther(uint256 balance);
 
   constructor(bool enableIssueDonation) public payable {
@@ -64,7 +39,7 @@ contract Heritage is Destructible, Managed, DonationCore {
 
     issueDonationEnabled = enableIssueDonation;
 
-    _createFundraiser("Genesis Donation", 0, this, "", false);
+    _createFundraiser("Genesis Donation", 0, this, "");
   }
 
   // Do not accept any transactions that send Ether.
@@ -84,8 +59,7 @@ contract Heritage is Destructible, Managed, DonationCore {
     string _description,
     uint256 _goal,
     address _beneficiary,
-    string _taxId,
-    bool _claimable
+    string _taxId
   )
     public
     onlyManagers
@@ -93,63 +67,11 @@ contract Heritage is Destructible, Managed, DonationCore {
     returns (uint256)
   {
     require(donations.length < MAX_DONATIONS);
-    return _createFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
-  }
-
-  function createDAIFundraiser(
-    string _description,
-    uint256 _goal,
-    address _beneficiary,
-    string _taxId,
-    bool _claimable
-  )
-    public
-    onlyManagers
-    whenNotPaused
-    returns (uint256)
-  {
-    require(donations.length < MAX_DONATIONS);
-    return _createDAIFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
-  }
-
-  function proxyDonation(
-    uint256 _donationId,
-    address _donor
-  )
-    public
-    payable
-    onlyProxy
-    whenNotPaused
-  {
-    uint256 donationId = donations[_donationId].donationId;
-
-    // Is not a token/fiat donation
-    require(!isFiat[donationId]);
-    require(!isDai[donationId]);
-    // Cannot donate to deleted token/null address
-    require(donationBeneficiary[donationId] != address(0));
-    // A goal of 0 is uncapped
-    if (donationGoal[donationId] > 0) {
-      // It must not have reached it's goal
-      require(donationRaised[donationId] < donationGoal[donationId]);
-    }
-    _makeDonation(_donationId, msg.value, _donor, true);
-  }
-
-  function createFundraiserProxy(uint256 _donationId)
-    public
-    donationIdIsValid(_donationId)
-    whenNotPaused
-    returns (address proxyAddress)
-  {
-    require(!isFiat[_donationId]);
-    Proxy p = new Proxy(_donationId);
-    isProxy[p] = true;
-    return p;
+    return _createFundraiser(_description, _goal, _beneficiary, _taxId);
   }
 
   // Make a donation based on Id.
-  // Donate directly or proxy through another donation.
+  // Donate directly.
   function makeDonation(uint256 _donationId)
     public
     payable
@@ -219,14 +141,6 @@ contract Heritage is Destructible, Managed, DonationCore {
     uint256 id = _makeDonation(donationId, _amount, _donor, false);
     isFiat[id];
     return id;
-  }
-
-  function claimDonation(uint256 _donationId)
-    public
-    whenNotPaused
-    onlyTokenOwner(_donationId)
-  {
-    _claimDonation(msg.sender, _donationId);
   }
 
   function deleteDonation(uint256 _donationId)

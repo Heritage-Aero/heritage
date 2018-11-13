@@ -22,12 +22,10 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
   mapping (uint256 => address) public donationBeneficiary;
   mapping (uint256 => uint256) public donationGoal;
   mapping (uint256 => uint256) public donationRaised;
-  mapping (uint256 => bool) public donationClaimable;
 
   // Event logging
-  event CreateFundraiser(string description, uint256 goal, address beneficiary, string taxId, address creator, bool claimable);
+  event CreateFundraiser(string description, uint256 goal, address beneficiary, string taxId, address creator);
   event MakeDonation(uint256 donationId, uint256 amount, address donor, address sender);
-  event ClaimDonation(address donor, uint256 donationId);
   event IssueDonation(uint256 donationId, uint256 amount, address donor, address issuer);
   event DeleteDonation(uint256 donationId);
 
@@ -49,8 +47,7 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
       uint256 _amount,
       address _beneficiary,
       address _donor,
-      string _taxId,
-      bool _claimable
+      string _taxId
     ) {
       uint256 origId = donations[_id].donationId;
 
@@ -63,29 +60,13 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
       _beneficiary = donationBeneficiary[origId];
       _donor = donations[_id].donor;
       _taxId = donationTaxId[origId];
-      _claimable = donationClaimable[_id];
-  }
-
-  function _createDAIFundraiser(
-    string _description,
-    uint256 _goal,
-    address _beneficiary,
-    string _taxId,
-    bool _claimable
-  ) internal
-    returns (uint256)
-  {
-    uint256 newDonationId = _createFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
-    _trackDaiDonation(newDonationId);
-    return newDonationId;
   }
 
   function _createFundraiser(
     string _description,
     uint256 _goal,
     address _beneficiary,
-    string _taxId,
-    bool _claimable
+    string _taxId
   )
     internal
     returns (uint256)
@@ -103,12 +84,11 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     donationBeneficiary[newDonationId] = _beneficiary;
     donationGoal[newDonationId] = _goal;
     donationTaxId[newDonationId] = _taxId;
-    donationClaimable[newDonationId] = _claimable;
 
     totalFundraisersCreated++;
 
     fundraisers.push(newDonationId);
-    emit CreateFundraiser(_description, _goal, _beneficiary, _taxId, msg.sender, _claimable);
+    emit CreateFundraiser(_description, _goal, _beneficiary, _taxId, msg.sender);
     return newDonationId;
   }
 
@@ -117,28 +97,14 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     returns (uint256)
   {
     Donation memory _donation;
-    // If the donation is marked as claimable, a future owner
-    // may assign their address later.
-    if (donationClaimable[_donationId]) {
-       _donation = Donation({
-        donationId: uint32(_donationId),
-        amount: uint128(_amount),
-        donor: address(0)
-      });
-    } else {
-      _donation = Donation({
-        donationId: uint32(_donationId),
-        amount: uint128(_amount),
-        donor: _donor
-      });
-    }
+
+    _donation = Donation({
+      donationId: uint32(_donationId),
+      amount: uint128(_amount),
+      donor: _donor
+    });
 
     uint256 newDonationId = donations.push(_donation) - 1;
-
-    // Mark the new donation id claimable by the owner
-    if (donationClaimable[_donationId]) {
-      donationClaimable[newDonationId] = true;
-    }
 
     // Minting an ERC-721 asset is optional
     if (mintToken) {
@@ -151,18 +117,6 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     }
 
     return newDonationId;
-  }
-
-  function _claimDonation(address _donor, uint256 _donationId)
-    internal
-  {
-    require(donationClaimable[_donationId] == true);
-    require(donations[_donationId].donor == address(0));
-
-    donations[_donationId].donor = _donor;
-
-    donationClaimable[_donationId] = false;
-    emit ClaimDonation(_donor, _donationId);
   }
 
   function _deleteDonation(uint256 _donationId)
