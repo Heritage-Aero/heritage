@@ -1,13 +1,14 @@
 pragma solidity 0.4.24;
 
-
 import "zeppelin-solidity/contracts/lifecycle/Destructible.sol";
 import "./Managed.sol";
 import "./DonationCore.sol";
 
-
 // Todo
 // Destroy Proxy once goal is met
+/**
+ * @title Proxy contract
+**/
 contract Proxy {
   Heritage heritage;
   uint256 donationId;
@@ -24,18 +25,27 @@ contract Proxy {
   }
 }
 
-
+/**
+ * @title Heritage
+**/
 contract Heritage is Destructible, Managed, DonationCore {
   uint256 constant MAX_DONATIONS = 2**128 - 1;
   bool public issueDonationEnabled = false;
   mapping (address => bool) public isProxy;
   mapping (uint256 => bool) public isFiat;
 
+  /**
+   * @dev modifier to check if issuing donations is enabled
+  **/
   modifier issueDonationIsEnabled() {
     require(issueDonationEnabled);
     _;
   }
 
+  /**
+   * @dev if a donation id is valid or not
+   * @param _donationId id of the donation
+  **/
   modifier donationIdIsValid(uint256 _donationId) {
     uint256 totalDonations = donations.length;
     // Cannot debelete Genesis
@@ -47,18 +57,27 @@ contract Heritage is Destructible, Managed, DonationCore {
     _;
   }
 
+  /**
+  * @dev modifier that throws if sender is not the owner of the donation
+  * @param _donationId id of the donation
+  **/
   modifier onlyTokenOwner(uint256 _donationId) {
     require(msg.sender == ownerOf(_donationId));
     _;
   }
 
+  /**
+   * @dev throws if not a proxy
+  **/
   modifier onlyProxy() {
     require(isProxy[msg.sender]);
     _;
   }
 
   event ReclaimEther(uint256 balance);
-
+  /**
+   * @dev creates a genesis donation. Sets a bool for enabling issuing donations
+  **/
   constructor(bool enableIssueDonation) public payable {
     require(msg.value == 0);
 
@@ -71,8 +90,9 @@ contract Heritage is Destructible, Managed, DonationCore {
   function() external {
   }
 
-  // Cannot prevent Ether from being mined/self-destructed to this contract
-  // reclaim lost Ether.
+  /**
+   * @dev Cannot prevent Ether from being mined/self-destructed to this contract. reclaim lost Ether.
+  **/
   function reclaimEther() external onlyOwner {
     uint256 _balance = address(this).balance;
 
@@ -80,6 +100,14 @@ contract Heritage is Destructible, Managed, DonationCore {
     emit ReclaimEther(_balance);
   }
 
+  /**
+   * @dev creates a new fundraiser
+   * @param _description of the fundraiser being created
+   * @param _goal goal set for the fundraiser
+   * @param _beneficiary address who receives funds
+   * @param _taxId id for taxes
+   * @param _claimable bool if fundraiser is claimable or not
+  **/
   function createFundraiser(
     string _description,
     uint256 _goal,
@@ -96,6 +124,14 @@ contract Heritage is Destructible, Managed, DonationCore {
     return _createFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
+  /**
+   * @dev function to create a DAI fundraiser
+   * @param _description of the fundraiser
+   * @param _goal goal set for the fundraiser
+   * @param _beneficiary address who receives funds
+   * @param _taxId taxId of the beneficary
+   * @param _claimable bool if claimable or not
+  **/
   function createDAIFundraiser(
     string _description,
     uint256 _goal,
@@ -112,6 +148,11 @@ contract Heritage is Destructible, Managed, DonationCore {
     return _createDAIFundraiser(_description, _goal, _beneficiary, _taxId, _claimable);
   }
 
+  /**
+   * @dev creates a proxy donation
+   * @param _donationId id of the donation
+   * @param _donor address of the donor
+  **/
   function proxyDonation(
     uint256 _donationId,
     address _donor
@@ -136,6 +177,11 @@ contract Heritage is Destructible, Managed, DonationCore {
     _makeDonation(_donationId, msg.value, _donor, true);
   }
 
+  /**
+   * @dev creates the proxy for a fundraiser
+   * @param _donationId id of the donation
+   * @return returns the address for the proxy
+  **/
   function createFundraiserProxy(uint256 _donationId)
     public
     donationIdIsValid(_donationId)
@@ -148,8 +194,10 @@ contract Heritage is Destructible, Managed, DonationCore {
     return p;
   }
 
-  // Make a donation based on Id.
-  // Donate directly or proxy through another donation.
+  /**
+   * @dev make a donation based on id. Donate directly or proxy through another donation.
+   * @param _donationId id of the donation
+  **/
   function makeDonation(uint256 _donationId)
     public
     payable
@@ -176,7 +224,11 @@ contract Heritage is Destructible, Managed, DonationCore {
     return _makeDonation(donationId, msg.value, msg.sender, true);
   }
 
-  // Make a DAI donation based on Id.
+  /**
+   * @dev Make a DAI donation based on Id.
+   * @param _donationId the id of the donation
+   * @param _amount the amount to donate
+  **/
   function makeDAIDonation(uint256 _donationId, uint256 _amount)
     public
     whenNotPaused
@@ -202,9 +254,12 @@ contract Heritage is Destructible, Managed, DonationCore {
     return _makeDonation(donationId, _amount, msg.sender, true);
   }
 
-  // Managers may issue donations directly. A way to accept fiat donations
-  // and credit an address. Optional -- disable/enable at deployment.
-  // Does not effect contract totals. Must issue to a created donation.
+  /**
+   * @dev managers may issue donations directly as a way to accept fiat donations and credit an address. Optional at deployment/
+   * @param _donationId id of the donation
+   * @param _amount donation amount
+   * @param _donor the donor
+  **/
   function issueDonation(uint256 _donationId, uint256 _amount, address _donor)
     public
     onlyManagers
@@ -221,6 +276,10 @@ contract Heritage is Destructible, Managed, DonationCore {
     return id;
   }
 
+  /**
+   * @dev claims the donation by a token owner
+   * @param _donationId id of the donation
+  **/
   function claimDonation(uint256 _donationId)
     public
     whenNotPaused
@@ -229,6 +288,10 @@ contract Heritage is Destructible, Managed, DonationCore {
     _claimDonation(msg.sender, _donationId);
   }
 
+  /**
+   * @dev function to delete a donation
+   * @param _donationId id of the donation
+  **/
   function deleteDonation(uint256 _donationId)
     public
     onlyOwner

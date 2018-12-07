@@ -3,7 +3,9 @@ pragma solidity 0.4.24;
 import "zeppelin-solidity/contracts/token/ERC721/ERC721BasicToken.sol";
 import "./DaiDonation.sol";
 
-
+/**
+ * @title DonationCore
+**/
 contract DonationCore is ERC721BasicToken, DaiDonation {
   // Soft cap of 4,294,967,295 (2^32-1)
   // E.g. Fill every block for ~50 years
@@ -36,7 +38,11 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     address donor;      // 20 bytes
   }
 
-  // Returns the donation information
+  /**
+   * @dev get the donation info
+   * @param _id id of the donation to check
+   * @return returns information about the donation
+  **/
   function getDonation(uint256 _id) external view
     returns (
       uint256 _originalDonationId,
@@ -64,6 +70,14 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
         _claimable = donationClaimable[_id];
   }
 
+  /**
+   * @dev function to create a DAI fundraiser
+   * @param _description of the fundraiser being created
+   * @param _goal of the fundraiser
+   * @param _beneficiary address who receives donations
+   * @param _taxId taxId of the beneficary
+   * @param _claimable bool if claimable or not
+  **/
   function _createDAIFundraiser(
     string _description,
     uint256 _goal,
@@ -78,6 +92,14 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     return newDonationId;
   }
 
+  /**
+   * @dev function to create a fundraiser
+   * @param _description of the fundraiser
+   * @param _goal of the fundraiser
+   * @param _beneficiary address that shall receive funds
+   * @param _taxId taxId of the beneficiary
+   * @param _claimable bool if claimable or not
+  **/
   function _createFundraiser(
     string _description,
     uint256 _goal,
@@ -109,6 +131,13 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     return newDonationId;
   }
 
+  /**
+   * @dev function to make a donation
+   * @param _donationId id of the donation
+   * @param _amount fund amount to be sent
+   * @param _donor address of the donor
+   * @param mintToken if token is minted or not. This is optional
+  **/
   function _makeDonation(uint256 _donationId, uint256 _amount, address _donor, bool mintToken)
     internal
     returns (uint256)
@@ -150,6 +179,11 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     return newDonationId;
   }
 
+  /**
+   * @dev function to claim a donation
+   * @param _donor address of the donor
+   * @param _donationId id of the donation
+  **/
   function _claimDonation(address _donor, uint256 _donationId)
     internal
   {
@@ -162,6 +196,10 @@ contract DonationCore is ERC721BasicToken, DaiDonation {
     emit ClaimDonation(_donor, _donationId);
   }
 
+  /**
+   * @dev function to delete a donation
+   * @param _donationId id of the donation
+  **/
   function _deleteDonation(uint256 _donationId)
     internal
   {
