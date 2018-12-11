@@ -44,6 +44,9 @@ contract('Manager', accounts => {
       let donation = await heritage.getDonation(60);
       donation[2].should.be.equal("60 Batch 2");
     })
+    it('Fails to launch the same batch twice', async () => {
+      await assertRevert(manager.batchOne());
+    })
   })
 })
 

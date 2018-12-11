@@ -11,12 +11,15 @@ contract HeritageContract {
 
 contract Manager is Ownable, Destructible {
   HeritageContract heritage;
+  bool canBatchOne = true;
+  bool canBatchTwo = true;
 
   constructor(address _addr) {
     heritage = HeritageContract(_addr);
   }
 
   function batchOne() onlyOwner {
+    require(canBatchOne);
     heritage.createFundraiser("1", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("2", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("3", 0, address(0), "Tax Infos", false);
@@ -67,10 +70,12 @@ contract Manager is Ownable, Destructible {
     heritage.createFundraiser("48", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("49", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("50", 0, address(0), "Tax Infos", false);
+    canBatchOne = false;
   }
 
   function batchTwo() onlyOwner {
     // etc..
+    require(canBatchTwo);
     heritage.createFundraiser("Batch 2", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("Batch 2", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("Batch 2", 0, address(0), "Tax Infos", false);
@@ -81,5 +86,6 @@ contract Manager is Ownable, Destructible {
     heritage.createFundraiser("Batch 2", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("Batch 2", 0, address(0), "Tax Infos", false);
     heritage.createFundraiser("60 Batch 2", 0, address(0), "Tax Infos", false);
+    canBatchTwo = false;
   }
 }
